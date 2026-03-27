@@ -142,16 +142,8 @@ public class UserController {
                 message,
                 result);
 
-        HttpStatus status;
-        if (success) {
-            status = HttpStatus.OK;
-        } else if (partial) {
-            status = HttpStatus.MULTI_STATUS;
-        } else {
-            status = HttpStatus.BAD_REQUEST;
-        }
 
-        return ResponseEntity.status(status).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @PreAuthorize("hasRole('ADMIN')")

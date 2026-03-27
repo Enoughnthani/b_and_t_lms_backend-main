@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.app.b_and_t_lms.models.Role.RoleName;
+import com.app.b_and_t_lms.models.Status;
 import com.app.b_and_t_lms.models.User;
 
 public class UserData {
@@ -22,6 +23,8 @@ public class UserData {
     private LocalDateTime prevLogin;
     private List<RoleName> role;
     private Long id;
+    private Status status;
+    private boolean isActive;
 
     public UserData(User user) {
         id = user.getId();
@@ -36,6 +39,8 @@ public class UserData {
         lastLogin = user.getLastLogin();
         prevLogin = user.getPrevLogin();
         role = user.getRoles().stream().map(role -> role.getName()).toList();
+        status = user.getStatus();
+        isActive = user.isAccountNonLocked();
     }
 
     public String getFirstname() {
@@ -84,6 +89,14 @@ public class UserData {
 
     public String getContactNumber() {
         return contactNumber;
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
+    public boolean isActive() {
+        return isActive;
     }
 
 }

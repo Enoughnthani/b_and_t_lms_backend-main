@@ -24,7 +24,7 @@ public class Role {
         MENTOR,
         ADMIN
     }
-
+ 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -35,7 +35,7 @@ public class Role {
 
     @ManyToOne
     @JsonIgnore
-    private User user;
+    private User user; 
 
     public Role() {
     }
