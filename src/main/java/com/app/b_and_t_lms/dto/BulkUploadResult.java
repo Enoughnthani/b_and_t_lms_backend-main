@@ -12,7 +12,7 @@ public class BulkUploadResult {
     private int errorCount = 0;
     private List<String> errors = new ArrayList<>();
     private List<UserData> createdUsers = new ArrayList<>();
-    private String summary;
+    private String summary; 
 
     // Helper method to increment success count
     public void incrementSuccess() {
