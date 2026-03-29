@@ -1,7 +1,9 @@
 package com.app.b_and_t_lms.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 
+@Data
 public class LoginRequest {
 
     @NotBlank(message = "email address is required.")
@@ -15,22 +17,6 @@ public class LoginRequest {
         this.email = email;
         this.password = password;
         this.rememberMe = rememberMe;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public boolean isRememberMe() {
-        return false;
-    }
-
-    public Boolean getRememberMe() {
-        return rememberMe;
     }
 
 }

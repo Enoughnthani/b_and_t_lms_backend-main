@@ -9,6 +9,9 @@ import com.app.b_and_t_lms.models.Role.RoleName;
 import com.app.b_and_t_lms.models.Status;
 import com.app.b_and_t_lms.models.User;
 
+import lombok.Data;
+
+@Data
 public class UserData {
 
     private String firstname;
@@ -41,62 +44,6 @@ public class UserData {
         role = user.getRoles().stream().map(role -> role.getName()).toList();
         status = user.getStatus();
         isActive = user.isAccountNonLocked();
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public Timestamp getCreatedAt() {
-        return createdAt;
-    }
-
-    public String getIdNo() {
-        return idNo;
-    }
-
-    public LocalDate getDob() {
-        return dob;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public List<RoleName> getRole() {
-        return role;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public LocalDateTime getLastLogin() {
-        return lastLogin;
-    }
-
-    public LocalDateTime getPrevLogin() {
-        return prevLogin;
-    }
-
-    public String getContactNumber() {
-        return contactNumber;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public boolean isActive() {
-        return isActive;
     }
 
 }

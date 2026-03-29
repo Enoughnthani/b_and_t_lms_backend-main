@@ -61,7 +61,7 @@ public class AuthService {
             new HttpSessionSecurityContextRepository()
                     .saveContext(context, request, response);
 
-            if (loginRequest.getRememberMe()) {
+            if (loginRequest.isRememberMe()) {
                 rememberMeServices.loginSuccess(request, response, authentication);
             }
 

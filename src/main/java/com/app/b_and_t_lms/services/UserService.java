@@ -20,11 +20,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.app.b_and_t_lms.dto.ApiResponse;
 import com.app.b_and_t_lms.dto.BulkOperationResult;
+import com.app.b_and_t_lms.dto.BulkRoleRequest;
+import com.app.b_and_t_lms.dto.BulkStatusRequest;
+import com.app.b_and_t_lms.dto.RoleAssignRequest;
 import com.app.b_and_t_lms.dto.UserDTO;
 import com.app.b_and_t_lms.dto.UserData;
 import com.app.b_and_t_lms.models.Role;
 import com.app.b_and_t_lms.models.Status;
 import com.app.b_and_t_lms.models.User;
+import com.app.b_and_t_lms.models.Role.RoleName;
 import com.app.b_and_t_lms.repositories.UserRepository;
 import com.app.b_and_t_lms.util.DataValidator;
 import com.app.b_and_t_lms.util.RsaIdInfo;
@@ -76,6 +80,100 @@ public class UserService {
 
         userRepository.save(user);
         return new ApiResponse<>(true, "User account created successfully", null);
+    }
+
+    @Transactional
+    public ApiResponse<UserData> updateUser(Long id, UserDTO dto) {
+
+        try {
+            User user = userRepository.findById(id).orElse(null);
+
+            if (user == null) {
+                return new ApiResponse<>(false, "User not found", null);
+            }
+
+           
+            if (dto.getEmail() != null && !dto.getEmail().equalsIgnoreCase(user.getEmail())) {
+                boolean exists = userRepository.existsByEmail(dto.getEmail());
+                if (exists) {
+                    return new ApiResponse<>(false, "Email already exists", new UserData(user));
+                }
+                user.setEmail(dto.getEmail());
+            }
+
+            // ✅ ID NUMBER UNIQUE CHECK
+            if (dto.getIdNo() != null && !dto.getIdNo().equals(user.getIdNumber())) {
+                boolean exists = userRepository.existsByIdNumber(dto.getIdNo());
+                if (exists) {
+                    return new ApiResponse<>(false, "ID number already exists", null);
+                }
+                user.setIdNumber(dto.getIdNo());
+            }
+
+            // ✅ BASIC FIELDS (ONLY UPDATE IF PROVIDED)
+            if (dto.getFirstname() != null) {
+                user.setFirstname(dto.getFirstname());
+            }
+
+            if (dto.getLastname() != null) {
+                user.setLastname(dto.getLastname());
+            }
+
+            if (dto.getContactNumber() != null) {
+                user.setContactNumber(dto.getContactNumber());
+            }
+
+            if (dto.getStatus() != null) {
+                user.setStatus(dto.getStatus());
+            }
+
+            if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
+                user.setPassword(passwordEncoder.encode(dto.getPassword()));
+            }
+
+            if (dto.getRole() != null && !dto.getRole().isEmpty()) {
+
+                List<Role> roles = new ArrayList<>();
+
+                for (RoleName roleName : dto.getRole()) {
+                    try {
+                        roles.add(new Role(roleName, user));
+                    } catch (Exception e) {
+                        return new ApiResponse<>(false, "Invalid role: " + roleName, null);
+                    }
+                }
+
+                user.getRoles().clear();
+                user.getRoles().addAll(roles);
+            }
+
+            User updatedUser = userRepository.save(user);
+            return new ApiResponse<>(true, "User updated successfully", new UserData(updatedUser));
+
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to update user", null);
+        }
+    }
+
+    public ApiResponse<?> deleteUser(Long id, Authentication authentication) {
+        try {
+
+            User deleteUser = userRepository.findById(id).orElse(null);
+
+            if (deleteUser == null) {
+                return new ApiResponse<>(false, "User not found", null);
+            }
+
+            if (deleteUser.isSuperUser()) {
+                return new ApiResponse<>(false, "Cannot delete system super admin account", null);
+            }
+
+            userRepository.deleteById(id);
+            return new ApiResponse<>(true, "User deleted successfully", null);
+
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to delete user: " + e.getMessage(), null);
+        }
     }
 
     public ApiResponse<?> updateUser(UserDTO dto) {
@@ -151,12 +249,9 @@ public class UserService {
         return apiResponse;
     }
 
-    public ApiResponse<Map<String, Object>> bulkCreateUsers(MultipartFile file) throws IOException {
+    public ApiResponse<BulkOperationResult> bulkCreateUsers(MultipartFile file) throws IOException {
 
-        Map<String, Object> payload = new HashMap<>();
-        List<String> errors = new ArrayList<>();
-        List<UserData> createdUsers = new ArrayList<>();
-        int successCount = 0;
+        BulkOperationResult result = new BulkOperationResult();
 
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
 
@@ -179,21 +274,16 @@ public class UserService {
                     .collect(Collectors.toList());
 
             List<String> requiredFields = List.of(
-                    "firstname",
-                    "lastname",
-                    "email",
-                    "phone",
-                    "idnumber",
-                    "roles",
-                    "status");
+                    "firstname", "lastname", "email", "phone", "idnumber", "roles", "status");
 
             List<String> missingHeaders = requiredFields.stream()
                     .filter(field -> !headers.contains(field))
                     .toList();
 
             if (!missingHeaders.isEmpty()) {
-                String message = "Invalid CSV format. Missing headers: " + String.join(", ", missingHeaders);
-                return new ApiResponse<>(false, message, null);
+                return new ApiResponse<>(false,
+                        "Invalid CSV format. Missing headers: " + String.join(", ", missingHeaders),
+                        null);
             }
 
             Map<String, Integer> headerIndex = new HashMap<>();
@@ -214,7 +304,7 @@ public class UserService {
                     String firstName = getValue(data, headerIndex, "firstname");
                     String lastName = getValue(data, headerIndex, "lastname");
                     String email = getValue(data, headerIndex, "email");
-                    String phoneNumber = getValue(data, headerIndex, "phonenumber");
+                    String phoneNumber = getValue(data, headerIndex, "phone");
                     String idNumber = getValue(data, headerIndex, "idnumber");
                     String dobStr = getValue(data, headerIndex, "dob");
                     String gender = getValue(data, headerIndex, "gender");
@@ -222,17 +312,20 @@ public class UserService {
 
                     // ===== VALIDATION =====
                     if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty()) {
-                        errors.add("Line " + lineNumber + ": firstname, lastname, email required");
+                        result.getErrors().add("Line " + lineNumber + ": firstname, lastname, email required");
+                        result.setErrorCount(result.getErrorCount() + 1);
                         continue;
                     }
 
                     if (userRepository.existsByEmail(email)) {
-                        errors.add("Line " + lineNumber + ": Email exists -> " + email);
+                        result.getErrors().add("Line " + lineNumber + ": Email exists -> " + email);
+                        result.setErrorCount(result.getErrorCount() + 1);
                         continue;
                     }
 
                     if (!idNumber.isEmpty() && userRepository.existsByIdNumber(idNumber)) {
-                        errors.add("Line " + lineNumber + ": ID exists -> " + idNumber);
+                        result.getErrors().add("Line " + lineNumber + ": ID exists -> " + idNumber);
+                        result.setErrorCount(result.getErrorCount() + 1);
                         continue;
                     }
 
@@ -247,63 +340,46 @@ public class UserService {
                     user.setStatus(Status.ACTIVE);
                     user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
 
-                    // DOB
                     if (!dobStr.isEmpty()) {
                         try {
                             user.setDob(LocalDate.parse(dobStr));
                         } catch (Exception e) {
-                            errors.add("Line " + lineNumber + ": Invalid DOB (YYYY-MM-DD)");
+                            result.getErrors().add("Line " + lineNumber + ": Invalid DOB");
+                            result.setErrorCount(result.getErrorCount() + 1);
                             continue;
                         }
                     }
 
-                    // Password
-                    String tempPassword = "#123";
-                    user.setPassword(passwordEncoder.encode(tempPassword));
+                    user.setPassword(passwordEncoder.encode("#123"));
 
-                    // Roles (optional)
+                    // Roles
                     if (!roleStr.isEmpty()) {
                         List<Role> roles = new ArrayList<>();
                         for (String r : roleStr.split(";|,")) {
-                            String roleNameStr = r.trim().toUpperCase(); // normalize for enum
-                            if (roleNameStr.isEmpty())
-                                continue;
-
                             try {
-                                Role.RoleName roleName = Role.RoleName.valueOf(roleNameStr);
-                                Role role = new Role(roleName, user); // set name and user
-                                roles.add(role);
-                            } catch (IllegalArgumentException e) {
-                                errors.add("Line " + lineNumber + ": Invalid role -> " + r.trim());
+                                Role.RoleName roleName = Role.RoleName.valueOf(r.trim().toUpperCase());
+                                roles.add(new Role(roleName, user));
+                            } catch (Exception e) {
+                                result.getErrors().add("Line " + lineNumber + ": Invalid role -> " + r.trim());
                             }
                         }
-
-                        if (!roles.isEmpty()) {
-                            user.setRoles(roles);
-                        }
+                        user.setRoles(roles);
                     }
 
                     User savedUser = userRepository.save(user);
-                    createdUsers.add(new UserData(savedUser));
-                    successCount++;
+                    result.addSuccess(savedUser.getId());
 
                 } catch (Exception e) {
-                    errors.add("Line " + lineNumber + ": " + e.getMessage());
+                    result.getErrors().add("Line " + lineNumber + ": " + e.getMessage());
+                    result.setErrorCount(result.getErrorCount() + 1);
                 }
             }
         }
 
-        // ===== RESPONSE =====
-        payload.put("successCount", successCount);
-        payload.put("errorCount", errors.size());
-        payload.put("errors", errors);
-        payload.put("createdUsers", createdUsers);
+        String message = "Processed: " + (result.getSuccessCount() + result.getErrorCount()) +
+                ", " + result.getSummary();
 
-        String message = "Processed: " + (successCount + errors.size()) +
-                ", Success: " + successCount +
-                ", Errors: " + errors.size();
-
-        return new ApiResponse<>(true, message, payload);
+        return new ApiResponse<>(true, message, result);
     }
 
     private String getValue(List<String> data, Map<String, Integer> headerIndex, String key) {
@@ -332,26 +408,15 @@ public class UserService {
     }
 
     @Transactional
-    public BulkOperationResult bulkAssignRole(List<Long> userIds, String roleName) {
+    public ApiResponse<BulkOperationResult> bulkAssignRole(BulkRoleRequest request) {
 
         BulkOperationResult result = new BulkOperationResult();
-
-        // ✅ Validate role once
-        Role.RoleName roleEnum;
-        try {
-            roleEnum = Role.RoleName.valueOf(roleName);
-        } catch (IllegalArgumentException e) {
-            userIds.forEach(id -> result.addError(id, "Invalid role name"));
-            return result;
-        }
-
-        // ✅ Batch fetch users
-        List<User> users = userRepository.findAllById(userIds);
+        List<User> users = userRepository.findAllById(request.getUserIds());
 
         Map<Long, User> userMap = users.stream()
                 .collect(Collectors.toMap(User::getId, u -> u));
 
-        for (Long userId : userIds) {
+        for (Long userId : request.getUserIds()) {
 
             User user = userMap.get(userId);
 
@@ -362,7 +427,7 @@ public class UserService {
 
             try {
                 boolean hasRole = user.getRoles().stream()
-                        .anyMatch(r -> r.getName() == roleEnum);
+                        .anyMatch(r -> r.getName() == request.getRole());
 
                 if (hasRole) {
                     result.addError(userId, "User already has this role");
@@ -370,18 +435,15 @@ public class UserService {
                 }
 
                 Role role = new Role();
-                role.setName(roleEnum);
+                role.setName(request.getRole());
                 role.setUser(user);
 
                 user.getRoles().add(role);
-
-                // ✅ SAVE + FLUSH immediately
                 userRepository.saveAndFlush(user);
 
                 result.addSuccess(userId);
 
             } catch (org.springframework.dao.DataIntegrityViolationException e) {
-                // ✅ Handle DB constraint safely
                 result.addError(userId, "User already has this role");
 
             } catch (Exception e) {
@@ -389,43 +451,9 @@ public class UserService {
             }
         }
 
-        return result;
-    }
-
-    public UserData getUserById(Long id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getUserById'");
-    }
-
-    public ApiResponse<?> updateUser(Long id, UserDTO userDTO) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateUser'");
-    }
-
-    public ApiResponse<?> deleteUser(Long id, Authentication authentication) {
-        try {
-            User currentAdmin = (User) authentication.getPrincipal();
-
-            User deleteUser = userRepository.findById(id).orElse(null);
-
-            if (currentAdmin == null || deleteUser == null) {
-                return new ApiResponse<>(false, "User not found", null);
-            }
-
-            if (currentAdmin.getId().equals(deleteUser.getId())) {
-                return new ApiResponse<>(false, "You cannot delete your own account", null);
-            }
-
-            if (deleteUser.isSuperUser()) {
-                return new ApiResponse<>(false, "Cannot delete system super admin", null);
-            }
-
-            userRepository.deleteById(id);
-            return new ApiResponse<>(true, "User deleted successfully", null);
-
-        } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to delete user: " + e.getMessage(), null);
-        }
+        int total = result.getSuccessCount() + result.getErrorCount();
+        String message = "Processed: " + total + ", " + result.getSummary();
+        return new ApiResponse<>(true, message, result);
     }
 
     @Transactional
@@ -451,15 +479,11 @@ public class UserService {
                     continue;
                 }
 
-             
+                if (user.isSuperUser()) {
+                    result.addError(userId, "Cannot delete system super admin");
+                    continue;
+                }
 
-                // Optional: Check if user has active loans
-                // if (hasActiveLoans(userId)) {
-                // result.addError(userId, "User has active loans and cannot be deleted");
-                // continue;
-                // }
-
-                // Perform deletion
                 userRepository.deleteById(userId);
                 result.addSuccess(userId);
 
@@ -471,5 +495,110 @@ public class UserService {
         }
 
         return result;
+    }
+
+    @Transactional
+    public ApiResponse<?> activateUser(long userId) {
+
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            return new ApiResponse<>(false, "No user found with id " + userId, null);
+        }
+
+        if (user.getStatus().equals(Status.ACTIVE)) {
+            return new ApiResponse<>(true, "User is already active", null);
+        }
+
+        user.setStatus(Status.ACTIVE);
+        userRepository.save(user);
+        return new ApiResponse<>(true, "User activated", null);
+    }
+
+    @Transactional
+    public ApiResponse<?> deactivateUser(long userId) {
+
+        User user = userRepository.findById(userId).orElse(null);
+
+        if (user == null) {
+            return new ApiResponse<>(false, "No user found with id " + userId, null);
+        }
+
+        if (user.isSuperUser()) {
+            return new ApiResponse<>(false, "Cannot deactivate system super admin", null);
+        }
+
+        if (user.getStatus().equals(Status.INACTIVE)) {
+            return new ApiResponse<>(true, "User is already inactive", null);
+        }
+
+        user.setStatus(Status.INACTIVE);
+        userRepository.save(user);
+        return new ApiResponse<>(true, "User deactivated", null);
+    }
+
+    @Transactional
+    public ApiResponse<?> assignRoles(RoleAssignRequest roleAssignRequest) {
+        User user = userRepository.findById(roleAssignRequest.getUserId()).orElse(null);
+
+        if (user == null) {
+            return new ApiResponse<>(false, "No user found with id " + roleAssignRequest.getUserId(), null);
+        }
+
+        if (user.isSuperUser()) {
+            return new ApiResponse<>(false, "Cannot modify roles for system super admin", null);
+        }
+
+        if (roleAssignRequest.getRoles() == null || roleAssignRequest.getRoles().isEmpty()) {
+            return new ApiResponse<>(false, "No roles provided", null);
+        }
+
+        List<Role> roles = roleAssignRequest.getRoles().stream()
+                .map(roleName -> new Role(roleName, user))
+                .toList();
+
+        user.getRoles().clear();
+        user.getRoles().addAll(roles);
+        userRepository.save(user);
+        return new ApiResponse<>(true, "Changes saved", null);
+    }
+
+    @Transactional
+    public ApiResponse<BulkOperationResult> bulkUpdateStatus(BulkStatusRequest request) {
+
+        BulkOperationResult result = new BulkOperationResult();
+
+        List<User> users = userRepository.findAllById(request.getUserIds());
+
+        Map<Long, User> userMap = users.stream()
+                .collect(Collectors.toMap(User::getId, u -> u));
+
+        for (Long userId : request.getUserIds()) {
+
+            User user = userMap.get(userId);
+
+            if (user == null) {
+                result.addError(userId, "User not found");
+                continue;
+            }
+
+            try {
+                if (user.getStatus() == request.getStatus()) {
+                    result.addError(userId, "User is already: " + request.getStatus());
+                    continue;
+                }
+
+                user.setStatus(request.getStatus());
+                userRepository.save(user);
+                result.addSuccess(userId);
+
+            } catch (Exception e) {
+                result.addError(userId, "Failed to update status");
+            }
+        }
+        int total = result.getSuccessCount() + result.getErrorCount();
+        String message = "Processed: " + total + ", " + result.getSummary();
+
+        return new ApiResponse<>(true, message, result);
     }
 }
