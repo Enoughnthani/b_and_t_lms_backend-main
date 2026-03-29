@@ -1,7 +1,6 @@
 package com.app.b_and_t_lms.controllers;
 
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -24,6 +23,8 @@ import com.app.b_and_t_lms.dto.ApiResponse;
 import com.app.b_and_t_lms.dto.BulkDeleteRequest;
 import com.app.b_and_t_lms.dto.BulkOperationResult;
 import com.app.b_and_t_lms.dto.BulkRoleRequest;
+import com.app.b_and_t_lms.dto.BulkStatusRequest;
+import com.app.b_and_t_lms.dto.RoleAssignRequest;
 import com.app.b_and_t_lms.dto.UserDTO;
 import com.app.b_and_t_lms.dto.UserData;
 import com.app.b_and_t_lms.services.UserService;
@@ -32,12 +33,12 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/users")
+@PreAuthorize("hasRole('ADMIN')")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO) {
         ApiResponse<?> response;
@@ -46,23 +47,36 @@ public class UserController {
         } catch (DataIntegrityViolationException e) {
             response = new ApiResponse<>(false, "An account with this email or ID already exists.", null);
         } catch (Exception e) {
-            response = new ApiResponse<>(false, "Failed to create user account. " + e.getMessage(), null);
+            response = new ApiResponse<>(false, "Failed to create user account. ", null);
         }
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
+        ApiResponse<?> response;
+        try {
+            response = userService.updateUser(id, userDTO);
+        } catch (Exception e) {
+            response = new ApiResponse<>(false, "Failed to update user.", null);
+        }
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteUser(@PathVariable Long id, Authentication authentication) {
+        return ResponseEntity.ok(userService.deleteUser(id, authentication));
+    }
+
     @GetMapping
     public ResponseEntity<List<UserData>> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/bulk")
     public ResponseEntity<ApiResponse<?>> bulkCreateUsers(@RequestParam("file") MultipartFile file) {
 
         try {
-            // ===== VALIDATION =====
             if (file.isEmpty()) {
                 return ResponseEntity.badRequest()
                         .body(new ApiResponse<>(false, "File is empty", null));
@@ -77,80 +91,40 @@ public class UserController {
                         .body(new ApiResponse<>(false, "Only CSV files are allowed", null));
             }
 
-            // ===== SERVICE CALL =====
-            ApiResponse<Map<String, Object>> serviceResponse = userService.bulkCreateUsers(file);
-
-            // 🔥 Just return service response directly (no re-wrapping)
+            ApiResponse<?> serviceResponse = userService.bulkCreateUsers(file);
             return ResponseEntity.ok(serviceResponse);
 
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ApiResponse<>(false,
-                            "Failed to process bulk upload: " + e.getMessage(),
-                            null));
+            return ResponseEntity.ok(new ApiResponse<>(false, "Failed to process bulk upload: ", null));
         }
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
-    @GetMapping("/{id}")
-    public ResponseEntity<UserData> getUserById(@PathVariable Long id) {
-        UserData user = userService.getUserById(id);
-        return ResponseEntity.ok(user);
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
-        ApiResponse<?> response;
-        try {
-            response = userService.updateUser(id, userDTO);
-        } catch (Exception e) {
-            response = new ApiResponse<>(false, "Failed to update user.", null);
-        }
-        return ResponseEntity.ok(response);
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable Long id, Authentication authentication) {
-        return ResponseEntity.ok(userService.deleteUser(id, authentication));
-    }
-
-    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/bulk-role")
     public ResponseEntity<ApiResponse<BulkOperationResult>> bulkAssignRole(
             @RequestBody BulkRoleRequest request) {
 
-        BulkOperationResult result = userService.bulkAssignRole(
-                request.getUserIds(),
-                request.getRole());
+        try {
+            ApiResponse<BulkOperationResult> response = userService.bulkAssignRole(request);
+            return ResponseEntity.ok(response);
 
-        boolean success = result.isSuccess();
-        boolean partial = result.isPartialSuccess();
-
-        String message;
-        if (success) {
-            message = "Role assigned to " + result.getSuccessCount() + " users";
-        } else if (partial) {
-            message = "Role assignment partially completed. " + result.getSummary();
-        } else {
-            message = "Failed to assign roles. " + result.getSummary();
+        } catch (Exception e) {
+            return ResponseEntity.ok(
+                    new ApiResponse<>(false, "Failed to assign roles.", null));
         }
-
-        ApiResponse<BulkOperationResult> response = new ApiResponse<>(
-                success,
-                message,
-                result);
-
-
-        return ResponseEntity.ok(response);
     }
 
-    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("bulk-status")
+    public ApiResponse<?> bulkUpdateStatus(@RequestBody BulkStatusRequest request) {
+        try {
+            return userService.bulkUpdateStatus(request);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to update user status.", null);
+        }
+    }
+
     @PostMapping("/bulk-delete")
     public ResponseEntity<ApiResponse<BulkOperationResult>> bulkDeleteUsers(@RequestBody BulkDeleteRequest request) {
 
-        // Validate request
         if (request.getUserIds() == null || request.getUserIds().isEmpty()) {
             ApiResponse<BulkOperationResult> response = new ApiResponse<>(
                     false,
@@ -189,4 +163,34 @@ public class UserController {
 
         return ResponseEntity.status(status).body(response);
     }
+
+    @PostMapping("{userId}/activate")
+    public ApiResponse<?> activate(@PathVariable long userId) {
+        try {
+            return userService.activateUser(userId);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to activate user", null);
+        }
+    }
+
+    @PostMapping("{userId}/deactivate")
+    public ApiResponse<?> deactivate(@PathVariable long userId) {
+        try {
+            return userService.deactivateUser(userId);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to activate user", null);
+        }
+    }
+
+    @PutMapping("roles")
+    public ApiResponse<?> assignRoles(@RequestBody RoleAssignRequest roleAssignRequest) {
+
+        try {
+            return userService.assignRoles(roleAssignRequest);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to assign roles " + e, null);
+        }
+
+    }
+
 }

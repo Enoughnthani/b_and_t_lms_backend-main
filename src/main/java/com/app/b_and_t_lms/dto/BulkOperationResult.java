@@ -38,5 +38,4 @@ public class BulkOperationResult {
         return "Success: " + successCount + ", Errors: " + errorCount;
     }
 
-    // getters
 }

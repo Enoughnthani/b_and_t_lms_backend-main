@@ -51,7 +51,7 @@ public class User implements UserDetails {
     private LocalDateTime lastLogin;
     private LocalDateTime prevLogin;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER,orphanRemoval = true)
     private List<Role> roles;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
