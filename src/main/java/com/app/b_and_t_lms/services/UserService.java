@@ -91,8 +91,8 @@ public class UserService {
                 return new ApiResponse<>(false, "User not found", null);
             }
 
-            if (user.isSuperUser()) {
-                return new ApiResponse<>(false, "Cannot change admin roles", null);
+            if(user.isSuperUser() && dto.getStatus() != null && dto.getStatus().equals(Status.INACTIVE)) {
+                return new ApiResponse<>(false, "Cannot deactivate system super admin account", null);
             }
 
             if (dto.getEmail() != null && !dto.getEmail().equalsIgnoreCase(user.getEmail())) {
@@ -144,6 +144,14 @@ public class UserService {
                     }
                 }
 
+                boolean allMatch = roles.stream()
+                        .allMatch(r -> user.getRoles().stream()
+                                .anyMatch(ur -> ur.getName() == r.getName()));  
+
+                if (user.isSuperUser() && !allMatch) {
+                    return new ApiResponse<>(false, "Cannot change admin roles", null);
+                }
+
                 user.getRoles().clear();
                 user.getRoles().addAll(roles);
             }
@@ -158,7 +166,6 @@ public class UserService {
 
     public ApiResponse<?> deleteUser(Long id, Authentication authentication) {
         try {
-
 
             User deleteUser = userRepository.findById(id).orElse(null);
 
@@ -327,7 +334,7 @@ public class UserService {
 
                 } catch (Exception e) {
 
-                    result.getErrors().add("Line " + lineNumber + ": Unexpected error");
+                    result.getErrors().add("Line " + lineNumber + ": Unexpected error" + e.getMessage());
                     result.setErrorCount(result.getErrorCount() + 1);
                 }
             }
