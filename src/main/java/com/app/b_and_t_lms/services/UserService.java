@@ -7,7 +7,6 @@ import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,9 +25,9 @@ import com.app.b_and_t_lms.dto.RoleAssignRequest;
 import com.app.b_and_t_lms.dto.UserDTO;
 import com.app.b_and_t_lms.dto.UserData;
 import com.app.b_and_t_lms.models.Role;
+import com.app.b_and_t_lms.models.Role.RoleName;
 import com.app.b_and_t_lms.models.Status;
 import com.app.b_and_t_lms.models.User;
-import com.app.b_and_t_lms.models.Role.RoleName;
 import com.app.b_and_t_lms.repositories.UserRepository;
 import com.app.b_and_t_lms.util.DataValidator;
 import com.app.b_and_t_lms.util.RsaIdInfo;
@@ -92,7 +91,10 @@ public class UserService {
                 return new ApiResponse<>(false, "User not found", null);
             }
 
-           
+            if (user.isSuperUser()) {
+                return new ApiResponse<>(false, "Cannot change admin roles", null);
+            }
+
             if (dto.getEmail() != null && !dto.getEmail().equalsIgnoreCase(user.getEmail())) {
                 boolean exists = userRepository.existsByEmail(dto.getEmail());
                 if (exists) {
@@ -101,7 +103,6 @@ public class UserService {
                 user.setEmail(dto.getEmail());
             }
 
-            // ✅ ID NUMBER UNIQUE CHECK
             if (dto.getIdNo() != null && !dto.getIdNo().equals(user.getIdNumber())) {
                 boolean exists = userRepository.existsByIdNumber(dto.getIdNo());
                 if (exists) {
@@ -110,7 +111,6 @@ public class UserService {
                 user.setIdNumber(dto.getIdNo());
             }
 
-            // ✅ BASIC FIELDS (ONLY UPDATE IF PROVIDED)
             if (dto.getFirstname() != null) {
                 user.setFirstname(dto.getFirstname());
             }
@@ -137,6 +137,7 @@ public class UserService {
 
                 for (RoleName roleName : dto.getRole()) {
                     try {
+
                         roles.add(new Role(roleName, user));
                     } catch (Exception e) {
                         return new ApiResponse<>(false, "Invalid role: " + roleName, null);
@@ -174,51 +175,6 @@ public class UserService {
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to delete user: " + e.getMessage(), null);
         }
-    }
-
-    public ApiResponse<?> updateUser(UserDTO dto) {
-
-        ApiResponse<?> resp = DataValidator.validate(dto);
-        if (!resp.isSuccess()) {
-            return new ApiResponse<>(false, resp.getMessage(), null);
-        }
-
-        if (!RsaIdValidate.isValid(dto.getIdNo())) {
-            return new ApiResponse<>(false, "Invalid id number", null);
-        }
-
-        // Fetch existing user
-        User user = userRepository.findById(dto.getId())
-                .orElseThrow(() -> new RuntimeException("User not found"));
-
-        // Map roles
-        List<Role> roles = dto.getRole()
-                .stream()
-                .map(roleName -> new Role(roleName, user)) // careful: ideally fetch existing Role entities from DB
-                .toList();
-
-        String gender = RsaIdInfo.getGender(dto.getIdNo());
-        LocalDate dob = RsaIdInfo.getDateOfBirth(dto.getIdNo());
-
-        // Update fields
-        user.setFirstname(dto.getFirstname());
-        user.setLastname(dto.getLastname());
-        user.setEmail(dto.getEmail());
-
-        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
-            user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        }
-
-        user.setRoles(roles);
-        user.setGender(gender);
-        user.setDob(dob);
-        user.setContactNumber(dto.getContactNumber());
-        user.setIdNumber(dto.getIdNo());
-        user.setStatus(Status.ACTIVE);
-
-        userRepository.save(user);
-
-        return new ApiResponse<>(true, "User account updated successfully", null);
     }
 
     public List<UserData> getAllUsers() {
@@ -274,21 +230,16 @@ public class UserService {
                     .collect(Collectors.toList());
 
             List<String> requiredFields = List.of(
-                    "firstname", "lastname", "email", "phone", "idnumber", "roles", "status");
+                    "firstname", "lastname", "email", "contactNumber", "idNumber", "roles", "status");
 
             List<String> missingHeaders = requiredFields.stream()
-                    .filter(field -> !headers.contains(field))
+                    .filter(field -> !headers.contains(field.toLowerCase()))
                     .toList();
 
             if (!missingHeaders.isEmpty()) {
                 return new ApiResponse<>(false,
                         "Invalid CSV format. Missing headers: " + String.join(", ", missingHeaders),
                         null);
-            }
-
-            Map<String, Integer> headerIndex = new HashMap<>();
-            for (int i = 0; i < headers.size(); i++) {
-                headerIndex.put(headers.get(i), i);
             }
 
             // ===== ROWS =====
@@ -301,17 +252,23 @@ public class UserService {
                 try {
                     List<String> data = parseCSVLine(line);
 
-                    String firstName = getValue(data, headerIndex, "firstname");
-                    String lastName = getValue(data, headerIndex, "lastname");
-                    String email = getValue(data, headerIndex, "email");
-                    String phoneNumber = getValue(data, headerIndex, "phone");
-                    String idNumber = getValue(data, headerIndex, "idnumber");
-                    String dobStr = getValue(data, headerIndex, "dob");
-                    String gender = getValue(data, headerIndex, "gender");
-                    String roleStr = getValue(data, headerIndex, "roles");
+                    String firstName = getValue(data, 0);
+                    String lastName = getValue(data, 1);
+                    String email = getValue(data, 2);
+                    String phoneNumber = getValue(data, 3);
+                    String idNumber = getValue(data, 4);
+                    String roleStr = getValue(data, 5);
+
+                    String gender = RsaIdInfo.getGender(idNumber);
+                    LocalDate dobStr = RsaIdInfo.getDateOfBirth(idNumber);
+
+                    data.forEach(System.out::println);
+
+                    System.out.println("Id number ======================= " + idNumber);
 
                     // ===== VALIDATION =====
-                    if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty()) {
+                    if (firstName.isEmpty() || lastName.isEmpty() || email.isEmpty() || phoneNumber.isEmpty()
+                            || idNumber.isBlank()) {
                         result.getErrors().add("Line " + lineNumber + ": firstname, lastname, email required");
                         result.setErrorCount(result.getErrorCount() + 1);
                         continue;
@@ -337,18 +294,9 @@ public class UserService {
                     user.setContactNumber(phoneNumber);
                     user.setIdNumber(idNumber);
                     user.setGender(gender);
+                    user.setDob(dobStr);
                     user.setStatus(Status.ACTIVE);
                     user.setCreatedAt(new Timestamp(System.currentTimeMillis()));
-
-                    if (!dobStr.isEmpty()) {
-                        try {
-                            user.setDob(LocalDate.parse(dobStr));
-                        } catch (Exception e) {
-                            result.getErrors().add("Line " + lineNumber + ": Invalid DOB");
-                            result.setErrorCount(result.getErrorCount() + 1);
-                            continue;
-                        }
-                    }
 
                     user.setPassword(passwordEncoder.encode("#123"));
 
@@ -369,8 +317,16 @@ public class UserService {
                     User savedUser = userRepository.save(user);
                     result.addSuccess(savedUser.getId());
 
+                } catch (DataIntegrityViolationException e) {
+
+                    String message = resolveDatabaseError(e);
+
+                    result.getErrors().add("Line " + lineNumber + ": " + message);
+                    result.setErrorCount(result.getErrorCount() + 1);
+
                 } catch (Exception e) {
-                    result.getErrors().add("Line " + lineNumber + ": " + e.getMessage());
+
+                    result.getErrors().add("Line " + lineNumber + ": Unexpected error");
                     result.setErrorCount(result.getErrorCount() + 1);
                 }
             }
@@ -382,8 +338,7 @@ public class UserService {
         return new ApiResponse<>(true, message, result);
     }
 
-    private String getValue(List<String> data, Map<String, Integer> headerIndex, String key) {
-        Integer index = headerIndex.get(key);
+    private String getValue(List<String> data, Integer index) {
         return (index != null && index < data.size()) ? data.get(index).trim() : "";
     }
 
@@ -582,9 +537,14 @@ public class UserService {
                 continue;
             }
 
+            if (user.isSuperUser() && request.getStatus().equals(Status.INACTIVE)) {
+                result.addError(userId, "Can not deactivate super user.");
+                continue;
+            }
+
             try {
                 if (user.getStatus() == request.getStatus()) {
-                    result.addError(userId, "User is already: " + request.getStatus());
+                    result.addSuccess(userId);
                     continue;
                 }
 
@@ -600,5 +560,29 @@ public class UserService {
         String message = "Processed: " + total + ", " + result.getSummary();
 
         return new ApiResponse<>(true, message, result);
+    }
+
+    private String resolveDatabaseError(DataIntegrityViolationException e) {
+        String msg = e.getMostSpecificCause() != null
+                ? e.getMostSpecificCause().getMessage().toLowerCase()
+                : "";
+
+        if (msg.contains("uk_user_id_number")) {
+            return "Duplicate Entry ID number";
+        }
+
+        if (msg.contains("uk_user_email")) {
+            return "Duplicate Entry for Email";
+        }
+
+        if (msg.contains("uk_user_contact_number")) {
+            return "Duplicate Entry  Contact number.";
+        }
+
+        if (msg.contains("duplicate entry")) {
+            return "Duplicate value already exists";
+        }
+
+        return "Database error";
     }
 }

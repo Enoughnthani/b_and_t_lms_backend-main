@@ -25,9 +25,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "user")
+@Table(name = "user", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_user_email", columnNames = "email"),
+        @UniqueConstraint(name = "uk_user_id_number", columnNames = "id_number")
+})
 public class User implements UserDetails {
 
     @Id
@@ -51,7 +55,7 @@ public class User implements UserDetails {
     private LocalDateTime lastLogin;
     private LocalDateTime prevLogin;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER,orphanRemoval = true)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<Role> roles;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
