@@ -159,6 +159,7 @@ public class UserService {
     public ApiResponse<?> deleteUser(Long id, Authentication authentication) {
         try {
 
+
             User deleteUser = userRepository.findById(id).orElse(null);
 
             if (deleteUser == null) {
