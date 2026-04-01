@@ -1,6 +1,7 @@
 package com.app.b_and_t_lms.models;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,14 @@ import jakarta.persistence.OneToMany;
 @Entity
 public class Program {
 
+    public enum ProgramStatus {
+        NOTSTARTED, INPROGRESS, COMPLETED
+    }
+
+    public enum ProgramCategory {
+        LEARNERSHIP, INTERNSHIP, SHORT_COURSE
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -27,14 +36,19 @@ public class Program {
     @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProgramStaff> programStaffs = new ArrayList<>();
 
-    private String programType;
+    private String type;
+
+    @Column(columnDefinition = "TEXT")
+    private String location;
 
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    private ProgramCategory category;
+
     private long capacity;
 
-    private Status status;
+    private ProgramStatus status;
 
     private LocalDate startDate;
 
@@ -42,26 +56,32 @@ public class Program {
 
     private String imageUrl;
 
-    private LocalDate createdAt;
+    private LocalDateTime createdAt;
 
     public Program() {
     }
 
-    public Program(Long id, String name, List<Enrollment> enrollments, List<ProgramStaff> programStaffs,
-            String programType, String description, long capacity, Status status, LocalDate startDate,
-            LocalDate endDate, String imageUrl, LocalDate createdAt) {
+    public Program(Long id, String name, List<Enrollment> enrollments, List<ProgramStaff> programStaffs, String type,
+            String location, String description, ProgramCategory category, long capacity, ProgramStatus status,
+            LocalDate startDate, LocalDate endDate, String imageUrl, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.enrollments = enrollments;
         this.programStaffs = programStaffs;
-        this.programType = programType;
+        this.type = type;
+        this.location = location;
         this.description = description;
+        this.category = category;
         this.capacity = capacity;
         this.status = status;
         this.startDate = startDate;
         this.endDate = endDate;
         this.imageUrl = imageUrl;
         this.createdAt = createdAt;
+    }
+
+    public Program(List<Program> programs) {
+        //TODO Auto-generated constructor stub
     }
 
     public Long getId() {
@@ -96,20 +116,36 @@ public class Program {
         this.programStaffs = programStaffs;
     }
 
-    public String getProgramType() {
-        return programType;
+    public String getType() {
+        return type;
     }
 
-    public void setProgramType(String programType) {
-        this.programType = programType;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public LocalDate getCreatedAt() {
-        return createdAt;
+    public String getLocation() {
+        return location;
     }
 
-    public void setCreatedAt(LocalDate createdAt) {
-        this.createdAt = createdAt;
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public ProgramCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(ProgramCategory category) {
+        this.category = category;
     }
 
     public long getCapacity() {
@@ -120,11 +156,11 @@ public class Program {
         this.capacity = capacity;
     }
 
-    public Status getStatus() {
+    public ProgramStatus getStatus() {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(ProgramStatus status) {
         this.status = status;
     }
 
@@ -152,12 +188,12 @@ public class Program {
         this.imageUrl = imageUrl;
     }
 
-    public String getDescription() {
-        return description;
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
 }
