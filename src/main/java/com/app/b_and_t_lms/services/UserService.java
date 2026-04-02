@@ -91,7 +91,7 @@ public class UserService {
                 return new ApiResponse<>(false, "User not found", null);
             }
 
-            if(user.isSuperUser() && dto.getStatus() != null && dto.getStatus().equals(Status.INACTIVE)) {
+            if (user.isSuperUser() && dto.getStatus() != null && dto.getStatus().equals(Status.INACTIVE)) {
                 return new ApiResponse<>(false, "Cannot deactivate system super admin account", null);
             }
 
@@ -146,7 +146,7 @@ public class UserService {
 
                 boolean allMatch = roles.stream()
                         .allMatch(r -> user.getRoles().stream()
-                                .anyMatch(ur -> ur.getName() == r.getName()));  
+                                .anyMatch(ur -> ur.getName() == r.getName()));
 
                 if (user.isSuperUser() && !allMatch) {
                     return new ApiResponse<>(false, "Cannot change admin roles", null);
@@ -592,5 +592,16 @@ public class UserService {
         }
 
         return "Database error";
+    }
+
+    public ApiResponse<?> getAllLeaners() {
+
+        try {
+            List<User> learners = userRepository.findByRoles_Name(RoleName.LEARNER);
+            List<UserData> learnerData = learners.stream().map(UserData::new).toList();
+            return new ApiResponse<>(true, "Learners fetched successfully", learnerData);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to fetch learners", null);
+        }
     }
 }

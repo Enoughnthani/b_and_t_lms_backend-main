@@ -34,8 +34,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/users")
 @PreAuthorize("hasRole('ADMIN')")
-public class UserController {
-
+public class UserController { 
     @Autowired
     private UserService userService;
 
@@ -62,6 +61,12 @@ public class UserController {
         }
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/learners")
+    public ApiResponse<?> getMethodName() {
+        return userService.getAllLeaners();
+    }
+    
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, Authentication authentication) {
