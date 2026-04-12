@@ -1,6 +1,7 @@
 package com.app.b_and_t_lms.services;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -8,18 +9,26 @@ import org.springframework.stereotype.Service;
 
 import com.app.b_and_t_lms.dto.ApiResponse;
 import com.app.b_and_t_lms.dto.ProgramDTO;
+import com.app.b_and_t_lms.dto.UserData;
 import com.app.b_and_t_lms.models.Program;
+import com.app.b_and_t_lms.models.Program.ProgramCategory;
+import com.app.b_and_t_lms.models.Role.RoleName;
+import com.app.b_and_t_lms.models.User;
 import com.app.b_and_t_lms.repositories.ProgramRepository;
+import com.app.b_and_t_lms.repositories.UserRepository;
 
 @Service
 public class ProgramService {
 
     private final ProgramRepository programRepository;
     private final ImageStorageService imageStorageService;
+    private final UserRepository userRepository;
 
-    public ProgramService(ProgramRepository programRepository, ImageStorageService imageStorageService) {
+    public ProgramService(ProgramRepository programRepository, ImageStorageService imageStorageService,
+            UserRepository userRepository) {
         this.programRepository = programRepository;
         this.imageStorageService = imageStorageService;
+        this.userRepository = userRepository;
     }
 
     public ApiResponse<?> addProgram(ProgramDTO programDTO) {
@@ -41,7 +50,7 @@ public class ProgramService {
             return new ApiResponse<>(true, "Programs fetched successfully", programs);
 
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to fetch programs", null);
+            return new ApiResponse<>(false, "Failed to fetch programs "+e.getMessage(), null);
         }
     }
 
@@ -60,7 +69,7 @@ public class ProgramService {
             return new ApiResponse<>(true, "Program updated successfully", program);
 
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to update program "+e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to update program " + e.getMessage(), null);
         }
     }
 
@@ -111,4 +120,35 @@ public class ProgramService {
             return new ApiResponse<>(false, "Failed to fetch program", null);
         }
     }
+
+    public ApiResponse<?> getUsersByProgramCategory(Long id) {
+
+        try {
+            Program program = programRepository.findById(id).orElse(null);
+
+            if (program == null) {
+                return new ApiResponse<>(false, "Program not found", null);
+            }
+
+            List<User> users = new ArrayList<>();
+            ProgramCategory category = program.getCategory();
+
+            switch (category) {
+                case INTERNSHIP:
+                    users = userRepository.findByRolesName(RoleName.INTERN);
+                    break;
+
+                case SHORT_COURSE:
+                case LEARNERSHIP:
+                    users = userRepository.findByRolesName(RoleName.LEARNER);
+                    break;
+            }
+
+            return new ApiResponse<>(true, "Users", users.stream().map(UserData::new).toList());
+
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "An error has occured.", null);
+        }
+    }
+
 }

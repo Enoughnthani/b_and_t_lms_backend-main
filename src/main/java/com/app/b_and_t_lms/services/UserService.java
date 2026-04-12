@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -22,12 +23,17 @@ import com.app.b_and_t_lms.dto.BulkOperationResult;
 import com.app.b_and_t_lms.dto.BulkRoleRequest;
 import com.app.b_and_t_lms.dto.BulkStatusRequest;
 import com.app.b_and_t_lms.dto.RoleAssignRequest;
+import com.app.b_and_t_lms.dto.StaffDTO;
 import com.app.b_and_t_lms.dto.UserDTO;
 import com.app.b_and_t_lms.dto.UserData;
+import com.app.b_and_t_lms.models.Activity;
 import com.app.b_and_t_lms.models.Role;
 import com.app.b_and_t_lms.models.Role.RoleName;
 import com.app.b_and_t_lms.models.Status;
 import com.app.b_and_t_lms.models.User;
+import com.app.b_and_t_lms.models.Activity.ActionType;
+import com.app.b_and_t_lms.repositories.ActivityRepository;
+import com.app.b_and_t_lms.repositories.ProgramRepository;
 import com.app.b_and_t_lms.repositories.UserRepository;
 import com.app.b_and_t_lms.util.DataValidator;
 import com.app.b_and_t_lms.util.RsaIdInfo;
@@ -39,46 +45,73 @@ import jakarta.transaction.Transactional;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final ActivityRepository activityRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,
+            ProgramRepository programRepository, ActivityRepository activityRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.activityRepository = activityRepository;
     }
 
     public ApiResponse<?> createUser(UserDTO dto) {
+        try {
+            ApiResponse<?> resp = DataValidator.validate(dto);
 
-        ApiResponse<?> resp = DataValidator.validate(dto);
+            if (!resp.isSuccess()) {
+                return new ApiResponse<>(false, resp.getMessage(), null);
+            }
+ 
+            if (!RsaIdValidate.isValid(dto.getIdNo())) {
+                return new ApiResponse<>(false, "Invalid id number", null);
+            }
 
-        if (!resp.isSuccess()) {
-            return new ApiResponse<>(false, resp.getMessage(), null);
+            String gender = RsaIdInfo.getGender(dto.getIdNo());
+            LocalDate dob = RsaIdInfo.getDateOfBirth(dto.getIdNo());
+
+            User user = new User();
+
+            List<Role> roles = dto.getRole().stream().map(role -> new Role(role, user)).toList();
+
+            user.setFirstname(dto.getFirstname());
+            user.setLastname(dto.getLastname());
+            user.setEmail(dto.getEmail());
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+            user.setRoles(roles);
+            user.setCreatedAt(Timestamp.from(Instant.now()));
+            user.setGender(gender);
+            user.setDob(dob);
+            user.setContactNumber(dto.getContactNumber());
+            user.setIdNumber(dto.getIdNo());
+            user.setStatus(Status.ACTIVE);
+
+            userRepository.save(user);
+
+            Activity activity = new Activity();
+            createActivity(activity, "New user created.", ActionType.CREATED, user);
+            activityRepository.save(activity);
+
+            return new ApiResponse<>(true, "User account created successfully", null);
+
+        } catch (DataIntegrityViolationException e) {
+
+            String message = "Duplicate value";
+
+            if (e.getRootCause() != null && e.getRootCause().getMessage() != null) {
+                String rootMsg = e.getRootCause().getMessage();
+
+                if (rootMsg.contains("uk_user_email")) {
+                    message = "An account with this email already exists.";
+                } else if (rootMsg.contains("uk_user_id_number")) {
+                    message = "An account with this ID number already exists.";
+                }
+            }
+
+            return new ApiResponse<>(false, message, null);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to create user account. ", null);
         }
-
-        if (!RsaIdValidate.isValid(dto.getIdNo())) {
-            return new ApiResponse<>(false, "Invalid id number", null);
-        }
-
-        String gender = RsaIdInfo.getGender(dto.getIdNo());
-        LocalDate dob = RsaIdInfo.getDateOfBirth(dto.getIdNo());
-
-        User user = new User();
-
-        List<Role> roles = dto.getRole().stream().map(role -> new Role(role, user)).toList();
-
-        user.setFirstname(dto.getFirstname());
-        user.setLastname(dto.getLastname());
-        user.setEmail(dto.getEmail());
-        user.setPassword(passwordEncoder.encode(dto.getPassword()));
-        user.setRoles(roles);
-        user.setCreatedAt(Timestamp.from(Instant.now()));
-        user.setGender(gender);
-        user.setDob(dob);
-        user.setContactNumber(dto.getContactNumber());
-        user.setIdNumber(dto.getIdNo());
-        user.setStatus(Status.ACTIVE);
-
-        userRepository.save(user);
-        return new ApiResponse<>(true, "User account created successfully", null);
     }
 
     @Transactional
@@ -157,6 +190,10 @@ public class UserService {
             }
 
             User updatedUser = userRepository.save(user);
+
+            Activity activity = new Activity();
+            createActivity(activity, "User Updated.", ActionType.UPDATED, user);
+            activityRepository.save(activity);
             return new ApiResponse<>(true, "User updated successfully", new UserData(updatedUser));
 
         } catch (Exception e) {
@@ -178,39 +215,15 @@ public class UserService {
             }
 
             userRepository.deleteById(id);
+
+            Activity activity = new Activity();
+            createActivity(activity, "User Deleted.", ActionType.DELETED, deleteUser);
+            activityRepository.save(activity);
             return new ApiResponse<>(true, "User deleted successfully", null);
 
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to delete user: " + e.getMessage(), null);
         }
-    }
-
-    public List<UserData> getAllUsers() {
-        return userRepository.findAll().stream().map(UserData::new).toList();
-    }
-
-    public ApiResponse<?> deteleteUser(Long id) {
-
-        if (id == null) {
-            return new ApiResponse<>(false, "User id is required.", null);
-        }
-
-        ApiResponse<?> apiResponse = new ApiResponse<>();
-
-        try {
-            User user = userRepository.findById(id).orElse(null);
-
-            if (user == null) {
-                return new ApiResponse<>(false, "No user found", null);
-            }
-
-            userRepository.delete(user);
-            apiResponse = new ApiResponse<>(true, "User has been deleted successfully", null);
-        } catch (Exception e) {
-            apiResponse = new ApiResponse<>(false, "An error occurred while deleting the user.", null);
-        }
-
-        return apiResponse;
     }
 
     public ApiResponse<BulkOperationResult> bulkCreateUsers(MultipartFile file) throws IOException {
@@ -475,6 +488,10 @@ public class UserService {
 
         user.setStatus(Status.ACTIVE);
         userRepository.save(user);
+
+        Activity activity = new Activity();
+        createActivity(activity, "User Account Activated.", ActionType.ACTIVATED, user);
+        activityRepository.save(activity);
         return new ApiResponse<>(true, "User activated", null);
     }
 
@@ -497,6 +514,10 @@ public class UserService {
 
         user.setStatus(Status.INACTIVE);
         userRepository.save(user);
+
+        Activity activity = new Activity();
+        createActivity(activity, "User Account Deactivated.", ActionType.DEACTIVATED, user);
+        activityRepository.save(activity);
         return new ApiResponse<>(true, "User deactivated", null);
     }
 
@@ -594,14 +615,62 @@ public class UserService {
         return "Database error";
     }
 
-    public ApiResponse<?> getAllLeaners() {
+    public ApiResponse<?> getAllUsers() {
+        try {
+            return new ApiResponse<>(true, "users", userRepository.findAll().stream().map(UserData::new).toList());
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "not found", null);
+        }
+    }
+
+    public ApiResponse<?> getStaff() {
 
         try {
-            List<User> learners = userRepository.findByRoles_Name(RoleName.LEARNER);
+
+            List<User> staffUsers = userRepository
+                    .findByRolesNameIn(List.of(RoleName.FACILITATOR, RoleName.ASSESSOR, RoleName.MODERATOR));
+
+            return new ApiResponse<>(true, "Staffs", staffUsers.stream().map(StaffDTO::new).toList());
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to get staff " + e.getMessage(), null);
+        }
+    }
+
+    public ApiResponse<?> getAllLeaners() {
+        try {
+            List<User> learners = userRepository.findByRolesName(RoleName.LEARNER);
             List<UserData> learnerData = learners.stream().map(UserData::new).toList();
             return new ApiResponse<>(true, "Learners fetched successfully", learnerData);
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to fetch learners", null);
         }
+    }
+
+    public ApiResponse<?> getInterns() {
+        try {
+            List<User> interns = userRepository.findByRolesName(RoleName.INTERN);
+            List<UserData> internsData = interns.stream().map(UserData::new).toList();
+            return new ApiResponse<>(true, "Interns fetched successfully", internsData);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to fetch Interns", null);
+        }
+    }
+
+    public ApiResponse<?> getMentors() {
+        try {
+            List<User> mentors = userRepository.findByRolesName(RoleName.MENTOR);
+            List<StaffDTO> mentorsData = mentors.stream().map(StaffDTO::new).toList();
+            return new ApiResponse<>(true, "Mentors fetched successfully", mentorsData);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to fetch Mentors", null);
+        }
+    }
+
+    private void createActivity(Activity activity, String description, ActionType actionType, User user) {
+        activity.setDescription(description);
+        activity.setFirstname(user.getFirstname());
+        activity.setLastname(user.getLastname());
+        activity.setCreatedAt(LocalDateTime.now());
+        activity.setActionType(actionType);
     }
 }

@@ -7,11 +7,15 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import com.app.b_and_t_lms.models.Role.RoleName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -61,8 +65,8 @@ public class User implements UserDetails {
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "user")
     private Enrollment enrollment;
 
-    @OneToOne(cascade = CascadeType.ALL, optional = true, mappedBy = "user")
-    private ProgramStaff programStaffs;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
+    private List<ProgramStaff> programStaffs;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private UserOtp userOtp;
@@ -75,7 +79,7 @@ public class User implements UserDetails {
 
     public User(Long id, String firstname, String lastname, String email, String password, Timestamp createdAt,
             String idNumber, LocalDate dob, String gender, String contactNumber, Status status, LocalDateTime lastLogin,
-            LocalDateTime prevLogin, List<Role> roles, Enrollment enrollment, ProgramStaff programStaffs,
+            LocalDateTime prevLogin, List<Role> roles, Enrollment enrollment, List<ProgramStaff> programStaffs,
             UserOtp userOtp, boolean isSuperUser) {
         this.id = id;
         this.firstname = firstname;
@@ -228,11 +232,11 @@ public class User implements UserDetails {
         this.enrollment = enrollment;
     }
 
-    public ProgramStaff getProgramStaffs() {
+    public List<ProgramStaff> getProgramStaffs() {
         return programStaffs;
     }
 
-    public void setProgramStaffs(ProgramStaff programStaffs) {
+    public void setProgramStaffs(List<ProgramStaff> programStaffs) {
         this.programStaffs = programStaffs;
     }
 
@@ -290,6 +294,18 @@ public class User implements UserDetails {
 
     public void setSuperUser(boolean isSuperUser) {
         this.isSuperUser = isSuperUser;
+    }
+
+    private static final Set<RoleName> STAFF_ROLES = Set.of(
+            RoleName.FACILITATOR,
+            RoleName.ASSESSOR,
+            RoleName.MODERATOR,
+            RoleName.ADMIN,
+            RoleName.PROGRAM_MANAGER);
+
+    public boolean isStaff() {
+        return roles != null && roles.stream()
+                .anyMatch(r -> STAFF_ROLES.contains(r.getName()));
     }
 
 }

@@ -19,7 +19,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/programs")
 @Valid
-@PreAuthorize("hasRole(RoleName.ADMIN) or hasRole(RoleName.PROGRAM_MANAGER) ")
+@PreAuthorize("hasAnyRole('ADMIN', 'PROGRAM_MANAGER')")
 public class ProgramController {
 
     private final ProgramService programService;
@@ -54,4 +54,12 @@ public class ProgramController {
     public ApiResponse<?> deleteProgram(@PathVariable Long id) {
         return programService.deleteProgram(id);
     }
+
+    @GetMapping("/{programId}/candidates")
+    public ApiResponse<?> getCandidates(@PathVariable Long programId) {
+        return programService.getUsersByProgramCategory(programId);
+    }
+
+    
+
 }

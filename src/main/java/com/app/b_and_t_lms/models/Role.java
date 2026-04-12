@@ -10,8 +10,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
+import lombok.Data;
 
 @Entity
+@Data
 public class Role {
 
     public enum RoleName {
@@ -51,57 +53,6 @@ public class Role {
         this.user = user;
     }
 
-    public boolean isLearner() {
-        return name.equals(RoleName.LEARNER);
-    }
-
-    public boolean isAdmin() {
-        return name.equals(RoleName.ADMIN);
-    }
-
-    public boolean isFacilitator() {
-        return name.equals(RoleName.FACILITATOR);
-
-    }
-
-    public boolean isAssessor() {
-        return name.equals(RoleName.ASSESSOR);
-    }
-
-    public boolean isModerator() {
-        return name.equals(RoleName.MODERATOR);
-    }
-
-    public boolean isMentor() {
-        return name.equals(RoleName.MENTOR);
-    }
-
-    public boolean isIntern() {
-        return name.equals(RoleName.INTERN);
-    }
-
-    public long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
-    }
-
-    public RoleName getName() {
-        return name;
-    }
-
-    public void setName(RoleName name) {
-        this.name = name;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
+    
 
 }

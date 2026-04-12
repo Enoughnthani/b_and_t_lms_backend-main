@@ -1,75 +1,63 @@
 package com.app.b_and_t_lms.models;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.OneToMany;
+import lombok.Data;
 
 @Entity
+@Data
 public class ProgramStaff {
+
+    public enum StaffRole {
+        FACILITATOR,
+        ASSESSOR,
+        MODERATOR,
+        MENTOR
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
+    @JsonIgnoreProperties("programStaffs")
     @JoinColumn(name = "program_id")
     private Program program;
 
-    @OneToOne
-    @JoinColumn(name = "user_id")
+    @ManyToOne
     @JsonIgnore
+    @JoinColumn(name = "user_id")
     private User user;
 
-    private LocalDate assignedDate;
+    @OneToMany(mappedBy = "programStaff", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProgramStaffRole> assignedRoles = new ArrayList<>();
+
+    private LocalDateTime assignedDate;
 
     public ProgramStaff() {
     }
 
-    public ProgramStaff(Long id, Program program, User user, LocalDate assignedDate) {
+    public ProgramStaff(Long id, Program program, User user, List<ProgramStaffRole> assignedRoles,
+            LocalDateTime assignedDate) {
         this.id = id;
         this.program = program;
         this.user = user;
+        this.assignedRoles = assignedRoles;
         this.assignedDate = assignedDate;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Program getProgram() {
-        return program;
-    }
-
-    public void setProgram(Program program) {
-        this.program = program;
-    }
-
-    public User getStaff() {
-        return user;
-    }
-
-    public void setStaff(User user) {
-        this.user = user;
-    }
-
-    public LocalDate getAssignedDate() {
-        return assignedDate;
-    }
-
-    public void setAssignedDate(LocalDate assignedDate) {
-        this.assignedDate = assignedDate;
-    }
-
+    
 }

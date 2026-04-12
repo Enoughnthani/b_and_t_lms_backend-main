@@ -1,26 +1,40 @@
 package com.app.b_and_t_lms.controllers;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import com.app.b_and_t_lms.dto.ApiResponse;
+import com.app.b_and_t_lms.dto.EnrollmentRequestDTO;
+import com.app.b_and_t_lms.services.EnrollmentService;
 
 import jakarta.validation.Valid;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-
 
 @RestController
 @RequestMapping("/api/enrollments")
-@Valid
-@PreAuthorize("hasRole(RoleName.ADMIN) or hasRole(RoleName.PROGRAM_MANAGER) ")
+@PreAuthorize("hasAnyRole('ADMIN','PROGRAM_MANAGER')")
 public class EnrollmentController {
 
+    @Autowired
+    private EnrollmentService enrollmentService;
 
-    @PostMapping
-    public String enroll(@RequestBody String entity) {
-        //TODO: process POST request
-        
-        return entity;
+    @PostMapping("/enroll")
+    public ApiResponse<?> enroll(@Valid @RequestBody EnrollmentRequestDTO dto) {
+        return enrollmentService.enroll(dto);
     }
-    
+
+    @DeleteMapping("/remove")
+    public ApiResponse<?> remove(@Valid @RequestBody EnrollmentRequestDTO dto) {
+        return enrollmentService.remove(dto);
+    }
+
+    @PostMapping("/bulk/enroll")
+    public ApiResponse<?> bulkEnroll(@Valid @RequestBody EnrollmentRequestDTO dto) {
+        return enrollmentService.bulkEnroll(dto);
+    }
+
+    @DeleteMapping("/bulk/remove")
+    public ApiResponse<?> bulkRemove(@Valid @RequestBody EnrollmentRequestDTO dto) {
+        return enrollmentService.bulkRemove(dto);
+    }
 }

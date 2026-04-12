@@ -1,9 +1,6 @@
 package com.app.b_and_t_lms.controllers;
 
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,7 +23,6 @@ import com.app.b_and_t_lms.dto.BulkRoleRequest;
 import com.app.b_and_t_lms.dto.BulkStatusRequest;
 import com.app.b_and_t_lms.dto.RoleAssignRequest;
 import com.app.b_and_t_lms.dto.UserDTO;
-import com.app.b_and_t_lms.dto.UserData;
 import com.app.b_and_t_lms.services.UserService;
 
 import jakarta.validation.Valid;
@@ -34,39 +30,43 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/users")
 @PreAuthorize("hasRole('ADMIN')")
-public class UserController { 
+public class UserController {
     @Autowired
     private UserService userService;
 
     @PostMapping
-    public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userDTO) {
-        ApiResponse<?> response;
-        try {
-            response = userService.createUser(userDTO);
-        } catch (DataIntegrityViolationException e) {
-            response = new ApiResponse<>(false, "An account with this email or ID already exists.", null);
-        } catch (Exception e) {
-            response = new ApiResponse<>(false, "Failed to create user account. ", null);
-        }
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    public ApiResponse<?> createUser(@Valid @RequestBody UserDTO userDTO) {
+        return userService.createUser(userDTO);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
-        ApiResponse<?> response;
-        try {
-            response = userService.updateUser(id, userDTO);
-        } catch (Exception e) {
-            response = new ApiResponse<>(false, "Failed to update user.", null);
-        }
-        return ResponseEntity.ok(response);
+    public ApiResponse<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserDTO userDTO) {
+        return userService.updateUser(id, userDTO);
     }
 
     @GetMapping("/learners")
-    public ApiResponse<?> getMethodName() {
+    @PreAuthorize("hasRole('PROGRAM_MANAGER')")
+    public ApiResponse<?> getLeaners() {
         return userService.getAllLeaners();
     }
-    
+
+    @GetMapping("/interns")
+    @PreAuthorize("hasRole('PROGRAM_MANAGER')")
+    public ApiResponse<?> getInterns() {
+        return userService.getInterns();
+    }
+
+    @GetMapping("/mentors")
+    @PreAuthorize("hasRole('PROGRAM_MANAGER')")
+    public ApiResponse<?> getMentors() {
+        return userService.getMentors();
+    }
+
+    @GetMapping("/staff")
+    @PreAuthorize("hasRole('PROGRAM_MANAGER')")
+    public ApiResponse<?> getStaff() {
+        return userService.getStaff();
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable Long id, Authentication authentication) {
@@ -74,7 +74,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<List<UserData>> getAllUsers() {
+    public ResponseEntity<?> getAllUsers() {
         return ResponseEntity.ok(userService.getAllUsers());
     }
 
@@ -183,7 +183,7 @@ public class UserController {
         try {
             return userService.deactivateUser(userId);
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to activate user", null);
+            return new ApiResponse<>(false, "Failed to deactivate user " + e.getMessage(), null);
         }
     }
 

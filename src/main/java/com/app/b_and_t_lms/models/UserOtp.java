@@ -10,8 +10,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
+import lombok.Data;
 
 @Entity
+@Data
 public class UserOtp {
 
     @Id
@@ -60,84 +62,5 @@ public class UserOtp {
         this.lastRequestTime = lastRequestTime;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getOtp() {
-        return otp;
-    }
-
-    public void setOtp(String otp) {
-        this.otp = otp;
-    }
-
-    public LocalDateTime getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(LocalDateTime expiryDate) {
-        this.expiryDate = expiryDate;
-    }
-
-    public boolean isUsed() {
-        return used;
-    }
-
-    public void setUsed(boolean used) {
-        this.used = used;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public int getAttemptCount() {
-        return attemptCount;
-    }
-
-    public void setAttemptCount(int attemptCount) {
-        this.attemptCount = attemptCount;
-    }
-
-    public LocalDateTime getLastAttemptTime() {
-        return lastAttemptTime;
-    }
-
-    public void setLastAttemptTime(LocalDateTime lastAttemptTime) {
-        this.lastAttemptTime = lastAttemptTime;
-    }
-
-    public int getRequestCount() {
-        return requestCount;
-    }
-
-    public void setRequestCount(int requestCount) {
-        this.requestCount = requestCount;
-    }
-
-    public LocalDateTime getLastRequestTime() {
-        return lastRequestTime;
-    }
-
-    public void setLastRequestTime(LocalDateTime lastRequestTime) {
-        this.lastRequestTime = lastRequestTime;
-    }
-
+    
 }

@@ -47,7 +47,7 @@ public class UserDTO {
             @Email(message = "Invalid email") @NotBlank(message = "Email address is required") String email,
             String password, @NotNull(message = "Role is required") List<RoleName> role,
             @NotNull(message = "ID number is required") String idNo, Status status) {
-        this.id = id;
+        this.id = id == null ? 0 : id;
         this.firstname = firstname;
         this.lastname = lastname;
         this.contactNumber = contactNumber;

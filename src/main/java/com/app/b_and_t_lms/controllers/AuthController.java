@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.app.b_and_t_lms.dto.ApiResponse;
 import com.app.b_and_t_lms.dto.ForgotPasswordRequest;
 import com.app.b_and_t_lms.dto.LoginRequest;
-import com.app.b_and_t_lms.dto.UserData;
 import com.app.b_and_t_lms.security.UserPages;
 import com.app.b_and_t_lms.services.AuthService;
 import com.app.b_and_t_lms.services.PasswordResetService;
@@ -40,15 +39,15 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response) {
         try {
-            ApiResponse<UserData> userData = authService.login(new LoginRequest(email, password, rememberMe), request,
+            ApiResponse<?> userData = authService.login(new LoginRequest(email, password, rememberMe), request,
                     response);
             return ResponseEntity.ok(userData);
         } catch (Exception e) {
-            return ResponseEntity.ok(new ApiResponse<>(false, "Failed to login", null));
+            return ResponseEntity.ok(new ApiResponse<>(false, "Failed to login "+e.getMessage(), null));
         }
     }
 
-    @GetMapping("/check_auth")
+    @GetMapping
     public ResponseEntity<?> checkPage(Authentication authentication) {
         try {
             boolean isAuthenticated = authentication != null && authentication.isAuthenticated();
@@ -62,7 +61,6 @@ public class AuthController {
     @GetMapping("/me")
     public ResponseEntity<?> me(Authentication authentication) {
         try {
-            System.out.println(authentication);
             return ResponseEntity.ok(authService.me(authentication));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

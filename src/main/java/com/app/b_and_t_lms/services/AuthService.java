@@ -39,7 +39,7 @@ public class AuthService {
     @Autowired
     private UserRepository userRepository;
 
-    public ApiResponse<UserData> login(LoginRequest loginRequest, HttpServletRequest request,
+    public ApiResponse<?> login(LoginRequest loginRequest, HttpServletRequest request,
             HttpServletResponse response) {
 
         ApiResponse<?> resp = DataValidator.validate(loginRequest);
@@ -71,7 +71,11 @@ public class AuthService {
             user.setLastLogin(LocalDateTime.now());
             userRepository.save(user);
 
-            return new ApiResponse<>(true, "Login successful", new UserData(user));
+            if (user.isStaff()) {
+                return new ApiResponse<>(true, "Login successful", new UserData(user));
+            } else {
+                return new ApiResponse<>(true, "Login successful", new UserData(user));
+            }
 
         } catch (DisabledException ex) {
             return new ApiResponse<>(false, "Your account is inactive. Please contact support.", null);
@@ -88,6 +92,12 @@ public class AuthService {
 
         if (user == null) {
             return new ApiResponse<>(false, "Please login", null);
+        }
+
+        user = userRepository.findById(user.getId()).orElse(null);
+
+        if (user == null) {
+            return new ApiResponse<>(false, "Does not exist", null);
         }
 
         return new ApiResponse<>(true, "me", new UserData(user));

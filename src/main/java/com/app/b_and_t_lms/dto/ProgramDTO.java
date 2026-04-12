@@ -1,6 +1,7 @@
 package com.app.b_and_t_lms.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import com.app.b_and_t_lms.models.Program;
 import com.app.b_and_t_lms.models.Program.ProgramCategory;
@@ -45,6 +46,10 @@ public class ProgramDTO {
 
     private String imageBase64;
 
+    private List<ProgramEnrollment> enrollmentData;
+
+    private List<StaffDTO> programStaff;
+
     public ProgramDTO() {
     }
 
@@ -85,6 +90,12 @@ public class ProgramDTO {
         this.endDate = program.getEndDate();
         this.enrolledCount = program.getEnrollments().size();
         this.imageBase64 = program.getImageUrl();
+        this.enrollmentData = program.getEnrollments().stream()
+                .map(ProgramEnrollment::new)
+                .toList();
+        this.programStaff = program.getProgramStaffs().stream()
+                .map(StaffDTO::new)
+                .toList();
     }
 
 }

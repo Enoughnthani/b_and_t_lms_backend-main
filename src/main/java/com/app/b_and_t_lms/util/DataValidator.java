@@ -22,22 +22,18 @@ public class DataValidator {
                 Object value = field.get(obj);
                 String fieldName = field.getName();
 
-                // Capitalize once
                 fieldName = fieldName.substring(0, 1).toUpperCase()
                         + fieldName.substring(1);
 
-                // ✅ Null check
                 if (value == null) {
                     return new ApiResponse<>(false, fieldName + " is required", null);
                 }
-
-                // ✅ String check
+               
                 if (value instanceof String &&
                         ((String) value).replace("<p>", "").replace("</p>", "").trim().isEmpty()) {
                     return new ApiResponse<>(false, fieldName + " is required", null);
                 }
 
-                // ✅ List check (including List<String>)
                 if (value instanceof List<?> &&
                         ((List<?>) value).isEmpty()) {
                     return new ApiResponse<>(false, fieldName + " is required", null);
