@@ -5,7 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.app.b_and_t_lms.models.Role.RoleName;
+import com.app.b_and_t_lms.models.Role.RoleName; 
 import com.app.b_and_t_lms.models.User;
 
 public interface UserRepository extends JpaRepository<User, Long> {
@@ -19,5 +19,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
     List<User> findByRolesName(RoleName roleName);
 
     List<User> findByRolesNameIn(List<RoleName> roleNames);
+
+    Long countBySuperUserFalse();
 
 }

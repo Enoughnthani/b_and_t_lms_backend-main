@@ -15,7 +15,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import com.app.b_and_t_lms.models.Role.RoleName;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -72,7 +71,7 @@ public class User implements UserDetails {
     private UserOtp userOtp;
 
     @Column(nullable = false)
-    private boolean isSuperUser = false;
+    private boolean superUser = false;
 
     public User() {
     }
@@ -80,7 +79,7 @@ public class User implements UserDetails {
     public User(Long id, String firstname, String lastname, String email, String password, Timestamp createdAt,
             String idNumber, LocalDate dob, String gender, String contactNumber, Status status, LocalDateTime lastLogin,
             LocalDateTime prevLogin, List<Role> roles, Enrollment enrollment, List<ProgramStaff> programStaffs,
-            UserOtp userOtp, boolean isSuperUser) {
+            UserOtp userOtp, boolean superUser) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -98,7 +97,7 @@ public class User implements UserDetails {
         this.enrollment = enrollment;
         this.programStaffs = programStaffs;
         this.userOtp = userOtp;
-        this.isSuperUser = isSuperUser;
+        this.superUser = superUser;
     }
 
     public Long getId() {
@@ -288,13 +287,6 @@ public class User implements UserDetails {
         this.idNumber = idNumber;
     }
 
-    public boolean isSuperUser() {
-        return isSuperUser;
-    }
-
-    public void setSuperUser(boolean isSuperUser) {
-        this.isSuperUser = isSuperUser;
-    }
 
     private static final Set<RoleName> STAFF_ROLES = Set.of(
             RoleName.FACILITATOR,
@@ -306,6 +298,18 @@ public class User implements UserDetails {
     public boolean isStaff() {
         return roles != null && roles.stream()
                 .anyMatch(r -> STAFF_ROLES.contains(r.getName()));
+    }
+
+    public boolean isSuperUser() {
+        return superUser;
+    }
+
+    public void setSuperUser(boolean superUser) {
+        this.superUser = superUser;
+    }
+
+    public static Set<RoleName> getStaffRoles() {
+        return STAFF_ROLES;
     }
 
 }

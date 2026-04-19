@@ -62,7 +62,7 @@ public class UserService {
             if (!resp.isSuccess()) {
                 return new ApiResponse<>(false, resp.getMessage(), null);
             }
- 
+
             if (!RsaIdValidate.isValid(dto.getIdNo())) {
                 return new ApiResponse<>(false, "Invalid id number", null);
             }
@@ -612,12 +612,13 @@ public class UserService {
             return "Duplicate value already exists";
         }
 
-        return "Database error";
+        return "Database error"; 
     }
 
     public ApiResponse<?> getAllUsers() {
         try {
-            return new ApiResponse<>(true, "users", userRepository.findAll().stream().map(UserData::new).toList());
+            return new ApiResponse<>(true, "users",
+                    userRepository.findAll().stream().filter(user -> !user.isSuperUser()).map(UserData::new).toList());
         } catch (Exception e) {
             return new ApiResponse<>(false, "not found", null);
         }

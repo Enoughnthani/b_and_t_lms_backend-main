@@ -41,7 +41,7 @@ public class StaffDTO {
         this.status = user.getStatus();
         this.gender = user.getGender();
         this.isActive = user.isAccountNonLocked();
-        this.assignedRoles = user.getProgramStaffs().stream()
+        this.assignedRoles = user.getProgramStaffs().stream() 
                 .map(AssignedProgramRole::new)
                 .collect(Collectors.toMap(
                         AssignedProgramRole::getProgramId,

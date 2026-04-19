@@ -30,7 +30,7 @@ public class AdminService {
     public ApiResponse<?> getStats() {
 
         try {
-            Long totalusers = userRepository.count();
+            Long totalusers = userRepository.countBySuperUserFalse();
             Long totalPrograms = programRepository.count();
 
             Long totalActiveLearnerships = programRepository.countByCategoryAndStatus(ProgramCategory.LEARNERSHIP,
@@ -43,7 +43,7 @@ public class AdminService {
             return new ApiResponse<>(true, "stats", new AdminStats(totalusers, totalPrograms, totalActiveLearnerships,
                     totalActiveInternships, totalActiveShortCourses));
         } catch (Exception e) {
-            return new ApiResponse<>(false, "An error occured while fetching stats", null);
+            return new ApiResponse<>(false, "An error occured while fetching stats ", null);
         }
 
     }
