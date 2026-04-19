@@ -14,34 +14,32 @@ public class BulkUploadResult {
     private List<UserData> createdUsers = new ArrayList<>();
     private String summary; 
 
-    // Helper method to increment success count
+
     public void incrementSuccess() {
         this.successCount++;
     }
 
-    // Helper method to add an error
+    
     public void addError(String error) {
         this.errors.add(error);
         this.errorCount = this.errors.size();
     }
 
-    // Helper method to add a created user
+   
     public void addCreatedUser(UserData user) {
         this.createdUsers.add(user);
     }
 
-    // Helper method to check if upload had any errors
+
     public boolean hasErrors() {
         return !errors.isEmpty();
     }
 
-    // Helper method to get summary message
-    public String getSummary() {
+   
+    public String createSummary() {
         return String.format("Processed: %d total, Success: %d, Errors: %d",
                 successCount + errorCount, successCount, errorCount);
     }
 
-    public void setSummary(String summary) {
-        this.summary = summary;
-    }
+  
 }

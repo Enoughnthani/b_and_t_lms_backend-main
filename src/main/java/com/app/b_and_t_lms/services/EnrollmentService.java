@@ -89,7 +89,7 @@ public class EnrollmentService {
                         "User ID is required for removal", null);
             }
 
-            int count = enrollmentRepository.deleteByUserId(dto.getUserId());
+            enrollmentRepository.deleteByUserId(dto.getUserId());
 
             return new ApiResponse<>(true, user.getFirstname()+" removed.", new ProgramDTO(program));
 
