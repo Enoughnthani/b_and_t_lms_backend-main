@@ -27,11 +27,11 @@ import com.app.b_and_t_lms.dto.StaffDTO;
 import com.app.b_and_t_lms.dto.UserDTO;
 import com.app.b_and_t_lms.dto.UserData;
 import com.app.b_and_t_lms.models.Activity;
+import com.app.b_and_t_lms.models.Activity.ActionType;
 import com.app.b_and_t_lms.models.Role;
 import com.app.b_and_t_lms.models.Role.RoleName;
 import com.app.b_and_t_lms.models.Status;
 import com.app.b_and_t_lms.models.User;
-import com.app.b_and_t_lms.models.Activity.ActionType;
 import com.app.b_and_t_lms.repositories.ActivityRepository;
 import com.app.b_and_t_lms.repositories.ProgramRepository;
 import com.app.b_and_t_lms.repositories.UserRepository;
@@ -71,8 +71,13 @@ public class UserService {
             LocalDate dob = RsaIdInfo.getDateOfBirth(dto.getIdNo());
 
             User user = new User();
-
             List<Role> roles = dto.getRole().stream().map(role -> new Role(role, user)).toList();
+
+            ApiResponse<?> rolesValidation = validateRoles(dto.getRole());
+
+            if (rolesValidation != null) {
+                return rolesValidation;
+            }
 
             user.setFirstname(dto.getFirstname());
             user.setLastname(dto.getLastname());
@@ -115,7 +120,7 @@ public class UserService {
     }
 
     @Transactional
-    public ApiResponse<UserData> updateUser(Long id, UserDTO dto) {
+    public ApiResponse<?> updateUser(Long id, UserDTO dto) {
 
         try {
             User user = userRepository.findById(id).orElse(null);
@@ -162,6 +167,12 @@ public class UserService {
 
             if (dto.getPassword() != null && !dto.getPassword().isEmpty()) {
                 user.setPassword(passwordEncoder.encode(dto.getPassword()));
+            }
+
+            ApiResponse<?> rolesValidation = validateRoles(dto.getRole());
+
+            if (rolesValidation != null) {
+                return rolesValidation;
             }
 
             if (dto.getRole() != null && !dto.getRole().isEmpty()) {
@@ -332,6 +343,13 @@ public class UserService {
                                 result.getErrors().add("Line " + lineNumber + ": Invalid role -> " + r.trim());
                             }
                         }
+
+                        ApiResponse<?> rolesValidation = validateRoles(roles.stream().map(r -> r.getName()).toList());
+                        if (rolesValidation != null) {
+                            result.getErrors().add("Line " + lineNumber + ": " + rolesValidation.getMessage());
+                            result.setErrorCount(result.getErrorCount() + 1);
+                            continue;
+                        }
                         user.setRoles(roles);
                     }
 
@@ -410,20 +428,28 @@ public class UserService {
                     continue;
                 }
 
+                List<RoleName> roleNames = new ArrayList<>(user.getRoles().stream().map(r -> r.getName()).toList());
+                roleNames.add(request.getRole());
                 Role role = new Role();
                 role.setName(request.getRole());
                 role.setUser(user);
+
+                ApiResponse<?> rolesValidation = validateRoles(roleNames);
+                if (rolesValidation != null) {
+                    result.addError(userId, rolesValidation.getMessage());
+                    continue;
+                }
 
                 user.getRoles().add(role);
                 userRepository.saveAndFlush(user);
 
                 result.addSuccess(userId);
 
-            } catch (org.springframework.dao.DataIntegrityViolationException e) {
+            } catch (DataIntegrityViolationException e) {
                 result.addError(userId, "User already has this role");
 
             } catch (Exception e) {
-                result.addError(userId, "Failed to assign role");
+                result.addError(userId, "Failed to assign role ");
             }
         }
 
@@ -541,6 +567,12 @@ public class UserService {
                 .map(roleName -> new Role(roleName, user))
                 .toList();
 
+        ApiResponse<?> rolesValidation = validateRoles(roleAssignRequest.getRoles());
+
+        if (rolesValidation != null) {
+            return rolesValidation;
+        }
+
         user.getRoles().clear();
         user.getRoles().addAll(roles);
         userRepository.save(user);
@@ -612,7 +644,7 @@ public class UserService {
             return "Duplicate value already exists";
         }
 
-        return "Database error"; 
+        return "Database error";
     }
 
     public ApiResponse<?> getAllUsers() {
@@ -673,5 +705,27 @@ public class UserService {
         activity.setLastname(user.getLastname());
         activity.setCreatedAt(LocalDateTime.now());
         activity.setActionType(actionType);
+    }
+
+    private ApiResponse<?> validateRoles(List<RoleName> roles) {
+
+        if (roles == null || roles.isEmpty()) {
+            return new ApiResponse<>(false, "Please provide at least one role.", null);
+        }
+
+        if (roles.size() > 2) {
+            return new ApiResponse<>(false, "User can not have more than two roles.", null);
+        }
+
+        if (roles.size() == 2 && !(roles.contains(RoleName.FACILITATOR) && roles.contains(RoleName.ASSESSOR))) {
+            return new ApiResponse<>(false, "Inavlid role combination [" + getRole(roles, 0) + " and " + getRole(roles, 1)+']',
+                    null);
+        }
+
+        return null;
+    }
+
+    private String getRole(List<RoleName> roles, int i) {
+        return roles.get(i).toString().toLowerCase();
     }
 }
