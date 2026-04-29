@@ -67,6 +67,9 @@ public class User implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     private List<ProgramStaff> programStaffs;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "createdBy", orphanRemoval = true)
+    private List<Discussion> discussions;
+
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private UserOtp userOtp;
 
@@ -286,7 +289,6 @@ public class User implements UserDetails {
     public void setIdNumber(String idNumber) {
         this.idNumber = idNumber;
     }
-
 
     private static final Set<RoleName> STAFF_ROLES = Set.of(
             RoleName.FACILITATOR,

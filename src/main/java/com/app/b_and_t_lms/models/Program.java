@@ -33,11 +33,15 @@ public class Program {
     private String name;
 
 
+
     @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Enrollment> enrollments = new ArrayList<>();
 
     @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProgramStaff> programStaffs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Discussion> discussions = new ArrayList<>();
 
     private String type;
 
@@ -64,13 +68,15 @@ public class Program {
     public Program() {
     }
 
-    public Program(Long id, String name, List<Enrollment> enrollments, List<ProgramStaff> programStaffs, String type,
-            String location, String description, ProgramCategory category, long capacity, ProgramStatus status,
-            LocalDate startDate, LocalDate endDate, String imageUrl, LocalDateTime createdAt) {
+    public Program(Long id, String name, List<Enrollment> enrollments, List<ProgramStaff> programStaffs,
+            List<Discussion> discussions, String type, String location, String description, ProgramCategory category,
+            long capacity, ProgramStatus status, LocalDate startDate, LocalDate endDate, String imageUrl,
+            LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.enrollments = enrollments;
         this.programStaffs = programStaffs;
+        this.discussions = discussions;
         this.type = type;
         this.location = location;
         this.description = description;
@@ -82,9 +88,5 @@ public class Program {
         this.imageUrl = imageUrl;
         this.createdAt = createdAt;
     }
-
-    public Program(List<Program> programs) {
-    }
-
     
 }
