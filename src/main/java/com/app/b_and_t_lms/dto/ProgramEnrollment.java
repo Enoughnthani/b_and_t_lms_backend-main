@@ -26,6 +26,7 @@ public class ProgramEnrollment {
     private boolean isActive;
     private boolean enrolled;
     private LocalDateTime enrollmentDate;
+    private List<ReportDTO> reports;
 
     public ProgramEnrollment() {
     }
@@ -44,6 +45,14 @@ public class ProgramEnrollment {
         isActive = enrollment.getUser().isAccountNonLocked();
         enrollmentDate = enrollment.getEnrollmentDate();
         this.enrolled = true;
+
+        if (enrollment.getUser().getReports() != null) {
+            this.reports = enrollment.getUser()
+                    .getReports()
+                    .stream()
+                    .map(ReportDTO::new)
+                    .toList();
+        } 
     }
 
 }
