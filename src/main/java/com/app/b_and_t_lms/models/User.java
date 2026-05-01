@@ -29,6 +29,7 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import lombok.Data;
 
 @Entity
 @Table(name = "user", uniqueConstraints = {
@@ -67,6 +68,9 @@ public class User implements UserDetails {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "user", orphanRemoval = true)
     private List<ProgramStaff> programStaffs;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "submittedBy", orphanRemoval = true)
+    private List<Report> reports;
+
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "createdBy", orphanRemoval = true)
     private List<Discussion> discussions;
 
@@ -82,7 +86,7 @@ public class User implements UserDetails {
     public User(Long id, String firstname, String lastname, String email, String password, Timestamp createdAt,
             String idNumber, LocalDate dob, String gender, String contactNumber, Status status, LocalDateTime lastLogin,
             LocalDateTime prevLogin, List<Role> roles, Enrollment enrollment, List<ProgramStaff> programStaffs,
-            UserOtp userOtp, boolean superUser) {
+            List<Report> reports, List<Discussion> discussions, UserOtp userOtp, boolean superUser) {
         this.id = id;
         this.firstname = firstname;
         this.lastname = lastname;
@@ -99,6 +103,8 @@ public class User implements UserDetails {
         this.roles = roles;
         this.enrollment = enrollment;
         this.programStaffs = programStaffs;
+        this.reports = reports;
+        this.discussions = discussions;
         this.userOtp = userOtp;
         this.superUser = superUser;
     }
@@ -312,6 +318,22 @@ public class User implements UserDetails {
 
     public static Set<RoleName> getStaffRoles() {
         return STAFF_ROLES;
+    }
+
+    public List<Report> getReports() {
+        return reports;
+    }
+
+    public void setReports(List<Report> reports) {
+        this.reports = reports;
+    }
+
+    public List<Discussion> getDiscussions() {
+        return discussions;
+    }
+
+    public void setDiscussions(List<Discussion> discussions) {
+        this.discussions = discussions;
     }
 
 }
