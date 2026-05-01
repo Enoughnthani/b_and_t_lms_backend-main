@@ -94,7 +94,7 @@ public class UserService {
             userRepository.save(user);
 
             Activity activity = new Activity();
-            createActivity(activity, "New user created.", ActionType.CREATED, user);
+            createActivity(activity, "New user created.", ActionType.CREATED, user, null);
             activityRepository.save(activity);
 
             return new ApiResponse<>(true, "User account created successfully", null);
@@ -203,7 +203,7 @@ public class UserService {
             User updatedUser = userRepository.save(user);
 
             Activity activity = new Activity();
-            createActivity(activity, "User Updated.", ActionType.UPDATED, user);
+            createActivity(activity, "User Updated.", ActionType.UPDATED, user, null);
             activityRepository.save(activity);
             return new ApiResponse<>(true, "User updated successfully", new UserData(updatedUser));
 
@@ -228,7 +228,7 @@ public class UserService {
             userRepository.deleteById(id);
 
             Activity activity = new Activity();
-            createActivity(activity, "User Deleted.", ActionType.DELETED, deleteUser);
+            createActivity(activity, "User Deleted.", ActionType.DELETED, deleteUser, null);
             activityRepository.save(activity);
             return new ApiResponse<>(true, "User deleted successfully", null);
 
@@ -374,6 +374,11 @@ public class UserService {
         String message = "Processed: " + (result.getSuccessCount() + result.getErrorCount()) +
                 ", " + result.getSummary();
 
+        Activity activity = new Activity();
+        createActivity(activity, "Bulk Create.", ActionType.BULK_CREATE, null,
+                result.getSuccessCount() + " users created.");
+        activityRepository.save(activity);
+
         return new ApiResponse<>(true, message, result);
     }
 
@@ -455,6 +460,12 @@ public class UserService {
 
         int total = result.getSuccessCount() + result.getErrorCount();
         String message = "Processed: " + total + ", " + result.getSummary();
+
+        Activity activity = new Activity();
+        createActivity(activity, "Bulk Role Assignment", ActionType.BULK_ROLE_ASSIGN, null,
+                result.getSuccessCount() + " user(s) assigned to " + request.getRole().name() + " role.");
+        activityRepository.save(activity);
+
         return new ApiResponse<>(true, message, result);
     }
 
@@ -496,6 +507,10 @@ public class UserService {
             }
         }
 
+        Activity activity = new Activity();
+        createActivity(activity, "Bulk Delete", ActionType.BULK_DELETE, null,
+                result.getSuccessCount() + " users deleted");
+        activityRepository.save(activity);
         return result;
     }
 
@@ -516,7 +531,7 @@ public class UserService {
         userRepository.save(user);
 
         Activity activity = new Activity();
-        createActivity(activity, "User Account Activated.", ActionType.ACTIVATED, user);
+        createActivity(activity, "User Account Activated.", ActionType.ACTIVATED, user, null);
         activityRepository.save(activity);
         return new ApiResponse<>(true, "User activated", null);
     }
@@ -542,7 +557,7 @@ public class UserService {
         userRepository.save(user);
 
         Activity activity = new Activity();
-        createActivity(activity, "User Account Deactivated.", ActionType.DEACTIVATED, user);
+        createActivity(activity, "User Account Deactivated.", ActionType.DEACTIVATED, user, null);
         activityRepository.save(activity);
         return new ApiResponse<>(true, "User deactivated", null);
     }
@@ -576,6 +591,12 @@ public class UserService {
         user.getRoles().clear();
         user.getRoles().addAll(roles);
         userRepository.save(user);
+
+        Activity activity = new Activity();
+        createActivity(activity, "Role Assign", ActionType.ROLE_ASSIGN, user,
+                "Assigned to " + roleAssignRequest.getRoles() + " role(s).");
+        activityRepository.save(activity);
+
         return new ApiResponse<>(true, "Changes saved", null);
     }
 
@@ -620,6 +641,10 @@ public class UserService {
         int total = result.getSuccessCount() + result.getErrorCount();
         String message = "Processed: " + total + ", " + result.getSummary();
 
+        Activity activity = new Activity();
+        createActivity(activity, "Bulk Status Update", ActionType.BULK_STATUS_UPDATE, null,
+                result.getSuccessCount() + " users' statuses were updated to " + request.getStatus().name());
+        activityRepository.save(activity);
         return new ApiResponse<>(true, message, result);
     }
 
@@ -699,12 +724,18 @@ public class UserService {
         }
     }
 
-    private void createActivity(Activity activity, String description, ActionType actionType, User user) {
+    private void createActivity(Activity activity, String description, ActionType actionType, User user,
+            String message) {
+
+        if (user != null) {
+            activity.setFirstname(user.getFirstname());
+            activity.setLastname(user.getLastname());
+        }
+
         activity.setDescription(description);
-        activity.setFirstname(user.getFirstname());
-        activity.setLastname(user.getLastname());
         activity.setCreatedAt(LocalDateTime.now());
         activity.setActionType(actionType);
+        activity.setMessage(message);
     }
 
     private ApiResponse<?> validateRoles(List<RoleName> roles) {
@@ -718,7 +749,8 @@ public class UserService {
         }
 
         if (roles.size() == 2 && !(roles.contains(RoleName.FACILITATOR) && roles.contains(RoleName.ASSESSOR))) {
-            return new ApiResponse<>(false, "Inavlid role combination [" + getRole(roles, 0) + " and " + getRole(roles, 1)+']',
+            return new ApiResponse<>(false,
+                    "Inavlid role combination [" + getRole(roles, 0) + " and " + getRole(roles, 1) + ']',
                     null);
         }
 

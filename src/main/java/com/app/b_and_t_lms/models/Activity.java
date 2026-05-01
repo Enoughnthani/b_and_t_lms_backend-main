@@ -9,12 +9,23 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import lombok.Data;
 
 @Entity
+@Data
 public class Activity {
 
     public enum ActionType {
-        CREATED, DELETED, UPDATED,ACTIVATED,DEACTIVATED
+        CREATED,
+        DELETED,
+        UPDATED,
+        ROLE_ASSIGN,
+        ACTIVATED,
+        DEACTIVATED,
+        BULK_DELETE,
+        BULK_CREATE,
+        BULK_ROLE_ASSIGN,
+        BULK_STATUS_UPDATE
     }
 
     @Id
@@ -27,6 +38,8 @@ public class Activity {
 
     private String lastname;
 
+    private String message;
+
     private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
@@ -36,62 +49,16 @@ public class Activity {
     public Activity() {
     }
 
-    public Activity(Long id, String description, String firstname, String lastname, LocalDateTime createdAt,
-            ActionType actionType) {
+
+    public Activity(Long id, String description, String firstname, String lastname, String message,
+            LocalDateTime createdAt, ActionType actionType) {
         this.id = id;
         this.description = description;
         this.firstname = firstname;
         this.lastname = lastname;
+        this.message = message;
         this.createdAt = createdAt;
         this.actionType = actionType;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getFirstname() {
-        return firstname;
-    }
-
-    public void setFirstname(String firstname) {
-        this.firstname = firstname;
-    }
-
-    public String getLastname() {
-        return lastname;
-    }
-
-    public void setLastname(String lastname) {
-        this.lastname = lastname;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public ActionType getActionType() {
-        return actionType;
-    }
-
-    public void setActionType(ActionType actionType) {
-        this.actionType = actionType;
-    }
+    }    
 
 }

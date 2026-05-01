@@ -10,12 +10,11 @@ import com.app.b_and_t_lms.models.Program.ProgramStatus;
 import lombok.Data;
 
 @Data
-public class UserEnrollment {
+public class EnrollmentResponse {
 
     private Long id;
     private String name;
     private String type;
-    private Long capacity;
     private String description;
     private String location;
     private ProgramCategory category;
@@ -24,17 +23,16 @@ public class UserEnrollment {
     private LocalDate endDate;
     private String imageBase64;
 
-    public UserEnrollment() {
+    public EnrollmentResponse() {
     }
 
-    public UserEnrollment(Enrollment enrollment) {
+    public EnrollmentResponse(Enrollment enrollment) {
 
         Program program = enrollment.getProgram();
 
         this.id = program.getId();
         this.name = program.getName();
         this.type = program.getType();
-        this.capacity = program.getCapacity();
         this.description = program.getDescription();
         this.location = program.getLocation();
         this.category = program.getCategory();

@@ -35,7 +35,7 @@ public class UserData {
     private LocalDateTime asiggnedDate;
     private LocalDateTime enrolmentDate;
     private List<AssignedProgramDTO> assignedPrograms;
-    private UserEnrollment enrolledProgram;
+    private EnrollmentResponse enrolledProgram;
     private Boolean enrolled;
 
     public UserData() {
@@ -67,11 +67,11 @@ public class UserData {
         return enrolledProgram == null ? null : Boolean.TRUE;
     }
 
-    private UserEnrollment getEnrollmentProgram(User user) {
+    private EnrollmentResponse getEnrollmentProgram(User user) {
         if (user.getEnrollment() == null) {
             return null;
         } else {
-            return new UserEnrollment(user.getEnrollment());
+            return new EnrollmentResponse(user.getEnrollment());
         }
     }
 

@@ -57,6 +57,7 @@ public class SecurityConfig {
                         .permitAll()
                         .requestMatchers("/api/users/me").authenticated()
                         .requestMatchers("/api/admin/**").hasRole(RoleName.ADMIN.name())
+                        .requestMatchers("/api/content/upload").hasRole(RoleName.FACILITATOR.name())
                         .anyRequest().authenticated())
                 .rememberMe(remember -> remember
                         .key("EFFeUvtpiBQyfdUZisSExMgFLawH6e/Rf5YfdGh6lKF5Wy/KthZYdGC2keskGFUwGZI31k0TcAqhF6IFl2zUGg==")

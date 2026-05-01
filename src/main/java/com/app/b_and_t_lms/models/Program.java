@@ -25,14 +25,12 @@ public class Program {
     public enum ProgramCategory {
         LEARNERSHIP, INTERNSHIP, SHORT_COURSE
     }
- 
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
-
-
 
     @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Enrollment> enrollments = new ArrayList<>();
@@ -42,6 +40,9 @@ public class Program {
 
     @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Discussion> discussions = new ArrayList<>();
+
+    @OneToMany(mappedBy = "program", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<UnitStandard> unitStandards = new ArrayList<>();
 
     private String type;
 
@@ -69,14 +70,15 @@ public class Program {
     }
 
     public Program(Long id, String name, List<Enrollment> enrollments, List<ProgramStaff> programStaffs,
-            List<Discussion> discussions, String type, String location, String description, ProgramCategory category,
-            long capacity, ProgramStatus status, LocalDate startDate, LocalDate endDate, String imageUrl,
-            LocalDateTime createdAt) {
+            List<Discussion> discussions, List<UnitStandard> unitStandards, String type, String location,
+            String description, ProgramCategory category, long capacity, ProgramStatus status, LocalDate startDate,
+            LocalDate endDate, String imageUrl, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.enrollments = enrollments;
         this.programStaffs = programStaffs;
         this.discussions = discussions;
+        this.unitStandards = unitStandards;
         this.type = type;
         this.location = location;
         this.description = description;
@@ -88,5 +90,5 @@ public class Program {
         this.imageUrl = imageUrl;
         this.createdAt = createdAt;
     }
-    
+
 }
