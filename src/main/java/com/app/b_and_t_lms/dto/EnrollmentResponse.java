@@ -1,6 +1,7 @@
 package com.app.b_and_t_lms.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import com.app.b_and_t_lms.models.Enrollment;
 import com.app.b_and_t_lms.models.Program;
@@ -21,6 +22,7 @@ public class EnrollmentResponse {
     private ProgramStatus status;
     private LocalDate startDate;
     private LocalDate endDate;
+    private List<UnitStandardResponseDTO> unitStandards;
     private String imageBase64;
 
     public EnrollmentResponse() {
@@ -40,6 +42,7 @@ public class EnrollmentResponse {
         this.startDate = program.getStartDate();
         this.endDate = program.getEndDate();
         this.imageBase64 = program.getImageUrl();
+        this.unitStandards = program.getUnitStandards().stream().map(UnitStandardResponseDTO::new).toList();
     }
 
 }

@@ -54,8 +54,7 @@ public class UnitStandardResponseDTO {
         this.createdAt = unitStandard.getCreatedAt();
         this.updatedAt = unitStandard.getUpdatedAt();
     }
-
-    // Static method for list conversion
+    
     public static List<UnitStandardResponseDTO> fromEntities(List<UnitStandard> entities) {
         return entities.stream()
             .map(UnitStandardResponseDTO::new)
