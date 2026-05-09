@@ -24,11 +24,7 @@ public class UnitStandard {
     @Column(nullable = false, length = 255)
     private String title;
 
-<<<<<<< HEAD
-    @Column(length = 1000)
-=======
     @Column(columnDefinition = "TEXT")
->>>>>>> c13b675b96e1287ac668e4a860527469263bca48
     private String description;
 
     private Integer credits;
