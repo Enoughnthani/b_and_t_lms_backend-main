@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+C:\Users\enough\Desktop\b_and_t_lms\src\main\java\com\app\b_and_t_lms\BAndTLmsApplication.java
+=======
 C:\Users\Enough\Documents\b_and_t_lms_backend-main\src\main\java\com\app\b_and_t_lms\BAndTLmsApplication.java
 C:\Users\Enough\Documents\b_and_t_lms_backend-main\src\main\java\com\app\b_and_t_lms\config\AdminSetup.java
 C:\Users\Enough\Documents\b_and_t_lms_backend-main\src\main\java\com\app\b_and_t_lms\config\SecurityConfig.java
@@ -85,3 +88,4 @@ C:\Users\Enough\Documents\b_and_t_lms_backend-main\src\main\java\com\app\b_and_t
 C:\Users\Enough\Documents\b_and_t_lms_backend-main\src\main\java\com\app\b_and_t_lms\util\PasswordValidator.java
 C:\Users\Enough\Documents\b_and_t_lms_backend-main\src\main\java\com\app\b_and_t_lms\util\RsaIdInfo.java
 C:\Users\Enough\Documents\b_and_t_lms_backend-main\src\main\java\com\app\b_and_t_lms\util\RsaIdValidate.java
+>>>>>>> c13b675b96e1287ac668e4a860527469263bca48
