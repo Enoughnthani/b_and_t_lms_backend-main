@@ -17,7 +17,11 @@ import jakarta.servlet.ServletRequest;
 import jakarta.servlet.ServletResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+<<<<<<< HEAD
 import tools.jackson.databind.ObjectMapper;
+=======
+import com.fasterxml.jackson.databind.ObjectMapper; 
+>>>>>>> c13b675b96e1287ac668e4a860527469263bca48
 
 @Component
 public class FeedbackRateLimitFilter implements Filter {
@@ -48,6 +52,10 @@ public class FeedbackRateLimitFilter implements Filter {
 
         HttpServletRequest req = (HttpServletRequest) request;
         HttpServletResponse res = (HttpServletResponse) response;
+<<<<<<< HEAD
+=======
+        
+>>>>>>> c13b675b96e1287ac668e4a860527469263bca48
         // Prevent double filtering
         if (request.getAttribute(FILTER_APPLIED) != null) {
             chain.doFilter(request, response);
