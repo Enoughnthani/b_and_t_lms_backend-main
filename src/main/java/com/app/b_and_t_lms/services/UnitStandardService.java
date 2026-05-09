@@ -26,7 +26,6 @@ public class UnitStandardService {
     private final UnitStandardRepository unitStandardRepository;
     private final ProgramRepository programRepository;
 
-    // Get all unit standards for a program
     public List<UnitStandardResponseDTO> getByProgramId(Long programId) {
         List<UnitStandard> unitStandards = unitStandardRepository.findByProgramId(programId);
         return unitStandards.stream()
@@ -34,14 +33,12 @@ public class UnitStandardService {
                 .collect(Collectors.toList());
     }
 
-    // Get unit standard by ID
     public UnitStandardResponseDTO getById(Long unitStandardId) {
         UnitStandard unitStandard = unitStandardRepository.findById(unitStandardId)
                 .orElseThrow(() -> new RuntimeException("Unit Standard not found with id: " + unitStandardId));
         return new UnitStandardResponseDTO(unitStandard);
     }
 
-    // Get unit standards by program and type
     public List<UnitStandardResponseDTO> getByProgramIdAndType(Long programId, String type) {
         List<UnitStandard> unitStandards = unitStandardRepository.findByProgramIdAndType(programId, type);
         return unitStandards.stream()
@@ -49,7 +46,6 @@ public class UnitStandardService {
                 .collect(Collectors.toList());
     }
 
-    // Get unit standard with its content
     public UnitStandardResponseDTO getByIdWithContent(Long unitStandardId) {
         UnitStandard unitStandard = unitStandardRepository.findByIdWithContents(unitStandardId)
                 .orElseThrow(() -> new RuntimeException("Unit Standard not found with id: " + unitStandardId));
@@ -58,7 +54,6 @@ public class UnitStandardService {
 
     @Transactional
     public ApiResponse<?> create(UnitStandardRequestDTO dto) {
-        // Validate required fields
         if (dto.getTitle() == null || dto.getTitle().trim().isEmpty()) {
             throw new RuntimeException("Unit Standard title is required");
         }
@@ -91,13 +86,11 @@ public class UnitStandardService {
                 null);
     }
 
-    // Update unit standard
     @Transactional
     public UnitStandardResponseDTO update(Long unitStandardId, UnitStandardRequestDTO dto) {
         UnitStandard unitStandard = unitStandardRepository.findById(unitStandardId)
                 .orElseThrow(() -> new RuntimeException("Unit Standard not found with id: " + unitStandardId));
 
-        // Update fields if provided
         if (dto.getTitle() != null && !dto.getTitle().trim().isEmpty()) {
             unitStandard.setTitle(dto.getTitle());
         }
@@ -122,21 +115,23 @@ public class UnitStandardService {
         return new UnitStandardResponseDTO(updated);
     }
 
-    // Delete unit standard
     @Transactional
-    public void delete(Long unitStandardId) {
-        UnitStandard unitStandard = unitStandardRepository.findById(unitStandardId)
-                .orElseThrow(() -> new RuntimeException("Unit Standard not found with id: " + unitStandardId));
+    public ApiResponse<?> delete(Long unitStandardId) {
+        UnitStandard unitStandard = unitStandardRepository.findById(unitStandardId).orElse(null);
 
-        // Check if unit standard has content
+        if (unitStandard == null) {
+            return new ApiResponse<>(false, "Unit Standard not found with id: " + unitStandardId, null);
+        }
+
         if (unitStandard.getContents() != null && !unitStandard.getContents().isEmpty()) {
-            throw new RuntimeException("Cannot delete Unit Standard with existing content. Delete all content first.");
+            return new ApiResponse<>(false,
+                    "Cannot delete Unit Standard with existing content. Delete all content first.", null);
         }
 
         unitStandardRepository.delete(unitStandard);
+        return new ApiResponse<>(true, "Unit Standard deleted.", null);
     }
 
-    // Search unit standards by title
     public List<UnitStandardResponseDTO> search(Long programId, String keyword) {
         List<UnitStandard> results = unitStandardRepository.searchByProgramIdAndKeyword(programId, keyword);
         return results.stream()
@@ -144,13 +139,11 @@ public class UnitStandardService {
                 .collect(Collectors.toList());
     }
 
-    // Get total credits for a program
     public Integer getTotalCreditsByProgramId(Long programId) {
         Integer total = unitStandardRepository.getTotalCreditsByProgramId(programId);
         return total != null ? total : 0;
     }
 
-    // Get statistics for a program
     public UnitStandardStatsDTO getStatsByProgramId(Long programId) {
         List<UnitStandard> unitStandards = unitStandardRepository.findByProgramId(programId);
 
@@ -189,7 +182,6 @@ public class UnitStandardService {
                 0, 0, averageCredits, averageHours);
     }
 
-    // Get unit standards with no content
     public List<UnitStandardResponseDTO> getEmptyUnitStandards(Long programId) {
         List<UnitStandard> emptyStandards = unitStandardRepository.findEmptyUnitStandardsByProgramId(programId);
         return emptyStandards.stream()
@@ -197,7 +189,6 @@ public class UnitStandardService {
                 .collect(Collectors.toList());
     }
 
-    // Get unit standards that have content
     public List<UnitStandardResponseDTO> getUnitStandardsWithContent(Long programId) {
         List<UnitStandard> standardsWithContent = unitStandardRepository
                 .findUnitStandardsWithContentsByProgramId(programId);

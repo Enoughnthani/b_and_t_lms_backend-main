@@ -11,7 +11,18 @@ import java.util.List;
 public class Content {
 
     public enum ContentType {
-        FOLDER, PDF, DOCX, XLSX, PPTX, VIDEO, LINK, OTHER
+        FOLDER,
+        PDF,
+        DOCX,
+        XLSX,
+        PPTX,
+        VIDEO,
+        IMAGE,
+        AUDIO,
+        TEXT, 
+        OTHER,
+        ARCHIVE,
+        LINK
     }
 
     @Id

@@ -62,9 +62,8 @@ public class UnitStandardController {
     }
 
     @DeleteMapping("/{unitStandardId}")
-    public ResponseEntity<Void> delete(@PathVariable Long unitStandardId) {
-        unitStandardService.delete(unitStandardId);
-        return ResponseEntity.noContent().build();
+    public ApiResponse<?> delete(@PathVariable Long unitStandardId) {
+        return unitStandardService.delete(unitStandardId);
     }
 
     @GetMapping("/{unitStandardId}/with-content")

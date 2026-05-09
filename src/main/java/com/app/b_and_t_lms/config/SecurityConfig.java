@@ -52,13 +52,11 @@ public class SecurityConfig {
                                 .headers(headers -> headers
                                                 .frameOptions(frame -> frame.sameOrigin())) // Keep for other endpoints
 
-                                // Add this line to disable frame options for uploads
                                 .headers(headers -> headers
                                                 .frameOptions(frameOptions -> frameOptions.disable())
                                                 .addHeaderWriter((request, response) -> {
                                                         String path = request.getRequestURI();
                                                         if (path.startsWith("/uploads/")) {
-                                                                // Allow iframe for uploads content
                                                                 response.setHeader("X-Frame-Options", "ALLOWALL");
                                                         } else {
                                                                 response.setHeader("X-Frame-Options", "SAMEORIGIN");

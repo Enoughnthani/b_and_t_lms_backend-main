@@ -28,7 +28,7 @@ public class ContentService {
     private final ContentRepository contentRepository;
     private final UnitStandardRepository unitStandardRepository;
 
-    private final String UPLOAD_DIR = "uploads/content/";
+    private final String UPLOAD_DIR = "C:/uploads/content/";
 
     // Get root content for a unit standard
     public List<ContentResponseDTO> getUnitStandardRootContent(Long unitStandardId) {
@@ -118,7 +118,6 @@ public class ContentService {
             }
         }
 
-        // Create upload directory if not exists
         Path uploadPath = Paths.get(UPLOAD_DIR);
         if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
@@ -186,26 +185,6 @@ public class ContentService {
         return new ContentResponseDTO(saved);
     }
 
-    // Delete content
-    @Transactional
-    public void deleteContent(Long id) {
-        Content content = contentRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Content not found with id: " + id));
-
-        // Delete file from disk if it's a file
-        if (content.getType() != ContentType.FOLDER && content.getFileUrl() != null) {
-            try {
-                Path filePath = Paths.get(content.getFileUrl().replace("/uploads/", "uploads/"));
-                Files.deleteIfExists(filePath);
-            } catch (IOException e) {
-                System.err.println("Failed to delete file: " + e.getMessage());
-            }
-        }
-
-        contentRepository.delete(content);
-    }
-
-    // Move content to a different unit standard
     @Transactional
     public ContentResponseDTO moveToUnitStandard(Long contentId, Long unitStandardId) {
         Content content = contentRepository.findById(contentId)
@@ -214,7 +193,7 @@ public class ContentService {
         UnitStandard unitStandard = unitStandardRepository.findById(unitStandardId)
                 .orElseThrow(() -> new RuntimeException("Unit Standard not found with id: " + unitStandardId));
         content.setUnitStandard(unitStandard);
-        content.setParent(null); // Reset parent when moving
+        content.setParent(null);
 
         Content saved = contentRepository.save(content);
         return new ContentResponseDTO(saved);
@@ -228,5 +207,60 @@ public class ContentService {
         if (size < 1024 * 1024 * 1024)
             return String.format("%.1f MB", size / (1024.0 * 1024));
         return String.format("%.1f GB", size / (1024.0 * 1024 * 1024));
+    }
+
+    @Transactional
+    public void bulkDeleteContents(List<Long> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return;
+        }
+
+        List<Content> contents = contentRepository.findAllById(ids);
+        for (Content content : contents) {
+            if (content.getType() != ContentType.FOLDER && content.getFileUrl() != null) {
+                try {
+                    // Extract just the filename from the URL
+                    String fileUrl = content.getFileUrl();
+                    String filename = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+
+                    // Build the full path to your uploads directory
+                    Path filePath = Paths.get("C:/uploads/content/" + filename);
+                    // OR use relative path: Paths.get("uploads/content/" + filename);
+
+                    Files.deleteIfExists(filePath);
+                    System.out.println("Deleted file: " + filePath.toString());
+                } catch (IOException e) {
+                    System.err.println("Failed to delete file: " + e.getMessage());
+                }
+            }
+        }
+        contentRepository.deleteAllByIds(ids);
+    }
+
+    @Transactional
+    public void deleteContent(Long id) {
+        Content content = contentRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Content not found with id: " + id));
+
+        if (content.getType() != ContentType.FOLDER && content.getFileUrl() != null) {
+            try {
+                String fileUrl = content.getFileUrl();
+                String filename = fileUrl.substring(fileUrl.lastIndexOf("/") + 1);
+
+                Path filePath = Paths.get("C:/uploads/content/" + filename);
+                // OR: Paths.get("uploads/content/" + filename);
+
+                boolean deleted = Files.deleteIfExists(filePath);
+                if (deleted) {
+                    System.out.println("Deleted file: " + filePath.toString());
+                } else {
+                    System.out.println("File not found: " + filePath.toString());
+                }
+            } catch (IOException e) {
+                System.err.println("Failed to delete file: " + e.getMessage());
+            }
+        }
+
+        contentRepository.delete(content);
     }
 }

@@ -29,7 +29,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
-import lombok.Data;
 
 @Entity
 @Table(name = "user", uniqueConstraints = {

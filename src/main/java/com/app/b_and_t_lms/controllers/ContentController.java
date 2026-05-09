@@ -77,4 +77,10 @@ public class ContentController {
         contentService.deleteContent(id);
         return ResponseEntity.noContent().build();
     }
+
+    @DeleteMapping("/bulk")
+    public ResponseEntity<Void> bulkDeleteContents(@RequestBody List<Long> ids) {
+        contentService.bulkDeleteContents(ids);
+        return ResponseEntity.noContent().build();
+    }
 }
