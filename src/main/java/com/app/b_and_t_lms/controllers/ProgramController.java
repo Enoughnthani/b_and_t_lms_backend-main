@@ -60,6 +60,16 @@ public class ProgramController {
         return programService.getUsersByProgramCategory(programId);
     }
 
-    
+    @GetMapping("/{programId}/enrollments")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PROGRAM_MANAGER', 'FACILITATOR')")
+    public ApiResponse<?> getEnrolledLearners(@PathVariable Long programId) {
+        return programService.getEnrolledLearners(programId);
+    }
+
+    @GetMapping("/{programId}/stats")
+    @PreAuthorize("hasAnyRole('FACILITATOR')")
+    public ApiResponse<?> facilitatorProgramStats(@PathVariable Long programId) {
+        return programService.getFacilitatorProgramStats(programId);
+    }
 
 }

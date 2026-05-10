@@ -8,6 +8,8 @@ import java.util.Optional;
 import org.springframework.stereotype.Service;
 
 import com.app.b_and_t_lms.dto.ApiResponse;
+import com.app.b_and_t_lms.dto.FacilitatorProgramStats;
+import com.app.b_and_t_lms.dto.LearnerEnrollmentData;
 import com.app.b_and_t_lms.dto.ProgramDTO;
 import com.app.b_and_t_lms.dto.UserData;
 import com.app.b_and_t_lms.models.Program;
@@ -50,7 +52,7 @@ public class ProgramService {
             return new ApiResponse<>(true, "Programs fetched successfully", programs);
 
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to fetch programs "+e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to fetch programs " + e.getMessage(), null);
         }
     }
 
@@ -149,6 +151,33 @@ public class ProgramService {
         } catch (Exception e) {
             return new ApiResponse<>(false, "An error has occured.", null);
         }
+    }
+
+    public ApiResponse<?> getEnrolledLearners(Long programId) {
+        try {
+            Program program = programRepository.findById(programId)
+                    .orElseThrow(() -> new RuntimeException("Program not found"));
+
+            List<LearnerEnrollmentData> enrolledLearners = program.getEnrollments().stream()
+                    .map(LearnerEnrollmentData::new).toList();
+
+            return new ApiResponse<>(true, "Enrolled learners retrieved successfully",
+                    enrolledLearners);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to retrieve enrolled learners: " + e.getMessage(), null);
+        }
+    }
+
+    public ApiResponse<?> getFacilitatorProgramStats(Long programId) {
+
+        Program program = programRepository.findById(programId).orElse(null);
+
+        if (program == null) {
+            return new ApiResponse<>(false, "Program not found", null);
+        }
+
+        FacilitatorProgramStats stats = new FacilitatorProgramStats(program);
+        return new ApiResponse<>(true,"stats",stats);
     }
 
 }

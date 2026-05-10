@@ -54,11 +54,11 @@ public class UnitStandardController {
     }
 
     @PutMapping("/{unitStandardId}")
-    public ResponseEntity<UnitStandardResponseDTO> update(
+    public ApiResponse<?> update(
             @PathVariable Long unitStandardId,
             @RequestBody UnitStandardRequestDTO dto) {
-        UnitStandardResponseDTO updated = unitStandardService.update(unitStandardId, dto);
-        return ResponseEntity.ok(updated);
+        return unitStandardService.update(unitStandardId, dto);
+
     }
 
     @DeleteMapping("/{unitStandardId}")
@@ -79,6 +79,7 @@ public class UnitStandardController {
         List<UnitStandardResponseDTO> results = unitStandardService.search(programId, keyword);
         return ResponseEntity.ok(results);
     }
+
     @GetMapping("/program/{programId}/total-credits")
     public ResponseEntity<Integer> getTotalCredits(@PathVariable Long programId) {
         Integer totalCredits = unitStandardService.getTotalCreditsByProgramId(programId);
