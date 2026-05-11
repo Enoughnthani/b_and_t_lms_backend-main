@@ -30,9 +30,8 @@ public class ContentService {
 
     private final String UPLOAD_DIR = "C:/uploads/content/";
 
-    // Get root content for a unit standard
+   
     public List<ContentResponseDTO> getUnitStandardRootContent(Long unitStandardId) {
-        // Verify unit standard exists
         unitStandardRepository.findById(unitStandardId)
                 .orElseThrow(() -> new RuntimeException("Unit Standard not found with id: " + unitStandardId));
 
@@ -42,7 +41,6 @@ public class ContentService {
                 .collect(Collectors.toList());
     }
 
-    // Get children for a specific unit standard folder
     public List<ContentResponseDTO> getUnitStandardChildren(Long parentId, Long unitStandardId) {
         return contentRepository.findByParentIdAndUnitStandardId(parentId, unitStandardId)
                 .stream()
@@ -50,7 +48,6 @@ public class ContentService {
                 .collect(Collectors.toList());
     }
 
-    // Get children of a folder
     public List<ContentResponseDTO> getChildren(Long parentId) {
         return contentRepository.findByParentId(parentId)
                 .stream()
@@ -58,14 +55,13 @@ public class ContentService {
                 .collect(Collectors.toList());
     }
 
-    // Create content (folder or link)
+
     @Transactional
     public ContentResponseDTO createContent(ContentRequestDTO dto) {
         Content content = new Content();
         content.setName(dto.getName());
         content.setType(dto.getType());
 
-        // Unit standard is required
         if (dto.getUnitStandardId() == null) {
             throw new RuntimeException("Unit Standard ID is required");
         }
@@ -74,14 +70,13 @@ public class ContentService {
                 .orElseThrow(() -> new RuntimeException("Unit Standard not found with id: " + dto.getUnitStandardId()));
         content.setUnitStandard(unitStandard);
 
-        // Set parent folder (optional)
         if (dto.getParentId() != null) {
             Content parent = contentRepository.findById(dto.getParentId())
                     .orElseThrow(() -> new RuntimeException("Parent folder not found with id: " + dto.getParentId()));
             content.setParent(parent);
         }
 
-        // Set link URL if type is LINK
+
         if (dto.getType() == ContentType.LINK) {
             content.setExternalUrl(dto.getExternalUrl());
         }

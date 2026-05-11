@@ -15,6 +15,7 @@ import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -24,6 +25,7 @@ import com.app.b_and_t_lms.dto.AssessmentResponseDTO;
 import com.app.b_and_t_lms.models.Assessment;
 import com.app.b_and_t_lms.models.AssessmentSubmission;
 import com.app.b_and_t_lms.models.UnitStandard;
+import com.app.b_and_t_lms.models.User;
 import com.app.b_and_t_lms.repositories.AssessmentRepository;
 import com.app.b_and_t_lms.repositories.AssessmentSubmissionRepository;
 import com.app.b_and_t_lms.repositories.UnitStandardRepository;
@@ -40,7 +42,6 @@ public class AssessmentService {
     private final UnitStandardRepository unitStandardRepository;
     private final UserRepository userRepository;
 
-    // Fixed path to C:/uploads/
     private static final String UPLOAD_BASE_DIR = "C:/uploads/";
     private static final String ASSESSMENT_DIR = "assessments/";
     private static final String SUBMISSION_DIR = "submissions/";
@@ -68,9 +69,9 @@ public class AssessmentService {
     }
 
     @Transactional
-    public ApiResponse<?> createAssessment(String title, String description, String dueDateStr, 
-                                           Integer totalMarks, String type, Long unitStandardId, 
-                                           MultipartFile file) throws IOException {
+    public ApiResponse<?> createAssessment(String title, String description, String dueDateStr,
+            Integer totalMarks, String type, Long unitStandardId,
+            MultipartFile file) throws IOException {
         try {
             UnitStandard unitStandard = unitStandardRepository.findById(unitStandardId)
                     .orElseThrow(() -> new RuntimeException("Unit Standard not found"));
@@ -102,8 +103,8 @@ public class AssessmentService {
 
     @Transactional
     public ApiResponse<?> updateAssessment(Long id, String title, String description, String dueDateStr,
-                                           Integer totalMarks, String type, Long unitStandardId,
-                                           MultipartFile file) throws IOException {
+            Integer totalMarks, String type, Long unitStandardId,
+            MultipartFile file) throws IOException {
         try {
             Assessment assessment = assessmentRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Assessment not found"));
@@ -138,11 +139,11 @@ public class AssessmentService {
         try {
             Assessment assessment = assessmentRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Assessment not found"));
-            
+
             if (assessment.getFileUrl() != null) {
                 deleteOldFile(assessment.getFileUrl());
             }
-            
+
             assessmentRepository.delete(assessment);
             return new ApiResponse<>(true, "Assessment deleted successfully", null);
         } catch (Exception e) {
@@ -163,13 +164,13 @@ public class AssessmentService {
         try {
             Path filePath = Paths.get(UPLOAD_BASE_DIR + ASSESSMENT_DIR + filename);
             Resource resource = new UrlResource(filePath.toUri());
-            
+
             if (resource.exists() && resource.isReadable()) {
                 String contentType = Files.probeContentType(filePath);
                 if (contentType == null) {
                     contentType = "application/octet-stream";
                 }
-                
+
                 return ResponseEntity.ok()
                         .contentType(MediaType.parseMediaType(contentType))
                         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
@@ -183,41 +184,49 @@ public class AssessmentService {
     }
 
     @Transactional
-    public ApiResponse<?> submitAssessment(MultipartFile file, Long assessmentId) {
+    public ApiResponse<?> submitAssessment(MultipartFile file, Long assessmentId,Authentication authentication) {
         try {
             Assessment assessment = assessmentRepository.findById(assessmentId)
                     .orElseThrow(() -> new RuntimeException("Assessment not found"));
+
+            // Get the currently authenticated user
+            String email = authentication.getName();
             
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
             String savedFileName = saveFile(file, SUBMISSION_DIR);
-            
+
             AssessmentSubmission submission = new AssessmentSubmission();
             submission.setAssessment(assessment);
+            submission.setUser(user); // Set the user
             submission.setFileUrl("/uploads/" + SUBMISSION_DIR + savedFileName);
             submission.setFileName(file.getOriginalFilename());
             submission.setFileSize(file.getSize());
-            
+            submission.setStatus(AssessmentSubmission.SubmissionStatus.SUBMITTED);
+
             submissionRepository.save(submission);
             return new ApiResponse<>(true, "Assessment submitted successfully", null);
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to submit assessment: " + e.getMessage(), null);
         }
-    } 
+    }
 
     private String saveFile(MultipartFile file, String subDir) throws IOException {
         Path uploadPath = Paths.get(UPLOAD_BASE_DIR + subDir);
-        if (!Files.exists(uploadPath)) { 
+        if (!Files.exists(uploadPath)) {
             Files.createDirectories(uploadPath);
         }
-          
+
         String originalFilename = file.getOriginalFilename();
         String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         String filename = UUID.randomUUID().toString() + extension;
         Path filePath = uploadPath.resolve(filename);
-        
+
         Files.copy(file.getInputStream(), filePath);
         return filename;
     }
-    
+
     private void deleteOldFile(String fileUrl) throws IOException {
         if (fileUrl != null && fileUrl.contains("/uploads/")) {
             String relativePath = fileUrl.substring(fileUrl.indexOf("/uploads/") + 9);

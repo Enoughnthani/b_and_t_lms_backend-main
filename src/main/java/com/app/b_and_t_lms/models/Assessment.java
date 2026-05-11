@@ -1,9 +1,24 @@
 package com.app.b_and_t_lms.models;
 
-import jakarta.persistence.*;
-import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
+
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
+import jakarta.persistence.Table;
+import lombok.Data;
 
 @Entity
 @Data
@@ -12,10 +27,6 @@ public class Assessment {
 
     public enum AssessmentType {
         LEARNER_WORKBOOK, SUMMATIVE
-    }
-
-    public enum AssessmentStatus {
-        DRAFT, PUBLISHED, CLOSED
     }
 
     @Id
@@ -34,9 +45,6 @@ public class Assessment {
     @Enumerated(EnumType.STRING)
     private AssessmentType type;
 
-    @Enumerated(EnumType.STRING)
-    private AssessmentStatus status;
-
     private String fileUrl;
 
     private String fileName;
@@ -47,6 +55,9 @@ public class Assessment {
     @JoinColumn(name = "unit_standard_id")
     private UnitStandard unitStandard;
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "assessment", orphanRemoval = true)
+    List<AssessmentSubmission> assessmentSubmission;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
@@ -54,9 +65,6 @@ public class Assessment {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
-        if (status == null) {
-            status = AssessmentStatus.DRAFT;
-        }
     }
 
     @PreUpdate

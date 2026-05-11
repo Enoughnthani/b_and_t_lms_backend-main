@@ -3,6 +3,7 @@ package com.app.b_and_t_lms.dto;
 import lombok.Data;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.app.b_and_t_lms.models.Assessment;
 
@@ -14,7 +15,6 @@ public class AssessmentResponseDTO {
     private LocalDate dueDate;
     private Integer totalMarks;
     private String type;
-    private String status;
     private String fileUrl;
     private String fileName;
     private Long fileSize;
@@ -22,6 +22,7 @@ public class AssessmentResponseDTO {
     private String unitStandardTitle;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private List<AssessmentSubmissionDTO> assessmentSubmissionDTO;
 
     public AssessmentResponseDTO(Assessment assessment) {
         this.id = assessment.getId();
@@ -30,13 +31,15 @@ public class AssessmentResponseDTO {
         this.dueDate = assessment.getDueDate();
         this.totalMarks = assessment.getTotalMarks();
         this.type = assessment.getType() != null ? assessment.getType().name() : null;
-        this.status = assessment.getStatus() != null ? assessment.getStatus().name() : null;
         this.fileUrl = assessment.getFileUrl();
         this.fileName = assessment.getFileName();
         this.fileSize = assessment.getFileSize();
-        this.unitStandardId = assessment.getUnitStandard() != null ? assessment.getUnitStandard().getUnitStandardId() : null;
+        this.unitStandardId = assessment.getUnitStandard() != null ? assessment.getUnitStandard().getUnitStandardId()
+                : null;
         this.unitStandardTitle = assessment.getUnitStandard() != null ? assessment.getUnitStandard().getTitle() : null;
         this.createdAt = assessment.getCreatedAt();
         this.updatedAt = assessment.getUpdatedAt();
+        this.assessmentSubmissionDTO = assessment.getAssessmentSubmission().stream().map(AssessmentSubmissionDTO::new)
+                .toList();
     }
 }

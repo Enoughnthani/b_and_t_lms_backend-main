@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -14,35 +16,66 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/uploads")
 public class FileController {
 
+    private static final String ASSESSMENTS_DIR = "C:/uploads/assessments/";
     private static final String CONTENT_DIR = "C:/uploads/content/";
     private static final String PROGRAMS_DIR = "C:/uploads/programs/";
 
-    // Preview file (opens in browser)
-    @GetMapping("/content/{filename}")
+    // For /uploads/assessments/ path
+    @GetMapping("/uploads/assessments/{filename}")
+    public ResponseEntity<Resource> getAssessmentFile(@PathVariable String filename) throws IOException {
+        return serveFile(ASSESSMENTS_DIR, filename, "inline", null);
+    }
+
+    @GetMapping("/uploads/assessments/{filename}/download")
+    public ResponseEntity<Resource> downloadAssessmentFile(
+            @PathVariable String filename,
+            @RequestParam(required = false) String originalName) throws IOException {
+        
+        String decodedName = null;
+        if (originalName != null && !originalName.isEmpty()) {
+            decodedName = URLDecoder.decode(originalName, StandardCharsets.UTF_8.toString());
+        }
+        return serveFile(ASSESSMENTS_DIR, filename, "attachment", decodedName);
+    }
+
+    // For /uploads/content/ path
+    @GetMapping("/uploads/content/{filename}")
     public ResponseEntity<Resource> getContentFile(@PathVariable String filename) throws IOException {
-        return serveFile(CONTENT_DIR, filename, "inline");
+        return serveFile(CONTENT_DIR, filename, "inline", null);
     }
 
-    // Download file (forces download)
-    @GetMapping("/content/{filename}/download")
-    public ResponseEntity<Resource> downloadContentFile(@PathVariable String filename) throws IOException {
-        return serveFile(CONTENT_DIR, filename, "attachment");
+    @GetMapping("/uploads/content/{filename}/download")
+    public ResponseEntity<Resource> downloadContentFile(
+            @PathVariable String filename,
+            @RequestParam(required = false) String originalName) throws IOException {
+        
+        String decodedName = null;
+        if (originalName != null && !originalName.isEmpty()) {
+            decodedName = URLDecoder.decode(originalName, StandardCharsets.UTF_8.toString());
+        }
+        return serveFile(CONTENT_DIR, filename, "attachment", decodedName);
     }
 
-    @GetMapping("/programs/{filename}")
+    @GetMapping("/uploads/programs/{filename}")
     public ResponseEntity<Resource> getProgramFile(@PathVariable String filename) throws IOException {
-        return serveFile(PROGRAMS_DIR, filename, "inline");
+        return serveFile(PROGRAMS_DIR, filename, "inline", null);
     }
 
-    @GetMapping("/programs/{filename}/download")
-    public ResponseEntity<Resource> downloadProgramFile(@PathVariable String filename) throws IOException {
-        return serveFile(PROGRAMS_DIR, filename, "attachment");
+    @GetMapping("/uploads/programs/{filename}/download")
+    public ResponseEntity<Resource> downloadProgramFile(
+            @PathVariable String filename,
+            @RequestParam(required = false) String originalName) throws IOException {
+        
+        String decodedName = null;
+        if (originalName != null && !originalName.isEmpty()) {
+            decodedName = URLDecoder.decode(originalName, StandardCharsets.UTF_8.toString());
+        }
+        return serveFile(PROGRAMS_DIR, filename, "attachment", decodedName);
     }
 
-    private ResponseEntity<Resource> serveFile(String dir, String filename, String disposition) throws IOException {
+    private ResponseEntity<Resource> serveFile(String dir, String filename, String disposition, String originalName) throws IOException {
         Path path = Paths.get(dir).resolve(filename).normalize();
         Resource resource = new UrlResource(path.toUri());
 
@@ -60,9 +93,17 @@ public class FileController {
                     }
                 });
 
+        // Use original name for download, otherwise use UUID filename
+        String downloadFileName;
+        if ("attachment".equals(disposition) && originalName != null && !originalName.isEmpty()) {
+            downloadFileName = originalName;
+        } else {
+            downloadFileName = resource.getFilename();
+        }
+
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_TYPE, contentType)
-                .header(HttpHeaders.CONTENT_DISPOSITION, disposition + "; filename=\"" + resource.getFilename() + "\"")
+                .header(HttpHeaders.CONTENT_DISPOSITION, disposition + "; filename=\"" + downloadFileName + "\"")
                 .body(resource);
     }
 }
