@@ -201,14 +201,14 @@ public class AssessmentService {
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to submit assessment: " + e.getMessage(), null);
         }
-    }
+    } 
 
     private String saveFile(MultipartFile file, String subDir) throws IOException {
         Path uploadPath = Paths.get(UPLOAD_BASE_DIR + subDir);
-        if (!Files.exists(uploadPath)) {
+        if (!Files.exists(uploadPath)) { 
             Files.createDirectories(uploadPath);
         }
-        
+          
         String originalFilename = file.getOriginalFilename();
         String extension = originalFilename.substring(originalFilename.lastIndexOf("."));
         String filename = UUID.randomUUID().toString() + extension;
