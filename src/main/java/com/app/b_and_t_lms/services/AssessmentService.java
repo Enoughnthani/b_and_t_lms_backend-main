@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -85,8 +86,9 @@ public class AssessmentService {
             assessment.setTotalMarks(totalMarks);
             assessment.setType(Assessment.AssessmentType.valueOf(type));
             assessment.setUnitStandard(unitStandard);
+            assessment.setAssessmentSubmission(new ArrayList<>());
 
-            // Save file if provided
+            
             if (file != null && !file.isEmpty()) {
                 String savedFileName = saveFile(file, ASSESSMENT_DIR);
                 assessment.setFileUrl("/uploads/" + ASSESSMENT_DIR + savedFileName);

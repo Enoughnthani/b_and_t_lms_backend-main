@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UnitStandardStatsDTO {
+    
     private int total;
     private int fundamental;
     private int core;
@@ -17,4 +18,5 @@ public class UnitStandardStatsDTO {
     private int inProgress;
     private double averageCredits;
     private double averageHours;
+
 }

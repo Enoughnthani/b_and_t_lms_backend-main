@@ -22,7 +22,7 @@ public class AssessmentResponseDTO {
     private String unitStandardTitle;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private List<AssessmentSubmissionDTO> assessmentSubmissionDTO;
+    private List<AssessmentSubmissionDTO> assessmentSubmission;
 
     public AssessmentResponseDTO(Assessment assessment) {
         this.id = assessment.getId();
@@ -39,7 +39,7 @@ public class AssessmentResponseDTO {
         this.unitStandardTitle = assessment.getUnitStandard() != null ? assessment.getUnitStandard().getTitle() : null;
         this.createdAt = assessment.getCreatedAt();
         this.updatedAt = assessment.getUpdatedAt();
-        this.assessmentSubmissionDTO = assessment.getAssessmentSubmission().stream().map(AssessmentSubmissionDTO::new)
+        this.assessmentSubmission = assessment.getAssessmentSubmission().stream().map(AssessmentSubmissionDTO::new)
                 .toList();
     }
 }

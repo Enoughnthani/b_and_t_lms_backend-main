@@ -87,42 +87,41 @@ public class UnitStandardService {
     }
 
     @Transactional
-public ApiResponse<?> update(Long unitStandardId, UnitStandardRequestDTO dto) {
-    try {
-        UnitStandard unitStandard = unitStandardRepository.findById(unitStandardId).orElse(null);
-        
-        if (unitStandard==null) {
-            return new ApiResponse<>(false, "Unit Standard not found with id: " + unitStandardId, null);
-        }
-        
+    public ApiResponse<?> update(Long unitStandardId, UnitStandardRequestDTO dto) {
+        try {
+            UnitStandard unitStandard = unitStandardRepository.findById(unitStandardId).orElse(null);
 
-        if (dto.getTitle() != null && !dto.getTitle().trim().isEmpty()) {
-            unitStandard.setTitle(dto.getTitle());
-        }
+            if (unitStandard == null) {
+                return new ApiResponse<>(false, "Unit Standard not found with id: " + unitStandardId, null);
+            }
 
-        if (dto.getDescription() != null) {
-            unitStandard.setDescription(dto.getDescription());
-        }
+            if (dto.getTitle() != null && !dto.getTitle().trim().isEmpty()) {
+                unitStandard.setTitle(dto.getTitle());
+            }
 
-        if (dto.getCredits() != null) {
-            unitStandard.setCredits(dto.getCredits());
-        }
+            if (dto.getDescription() != null) {
+                unitStandard.setDescription(dto.getDescription());
+            }
 
-        if (dto.getNqfLevel() != null) {
-            unitStandard.setNqfLevel(dto.getNqfLevel());
-        }
+            if (dto.getCredits() != null) {
+                unitStandard.setCredits(dto.getCredits());
+            }
 
-        if (dto.getType() != null) {
-            unitStandard.setType(dto.getType());
-        }
+            if (dto.getNqfLevel() != null) {
+                unitStandard.setNqfLevel(dto.getNqfLevel());
+            }
 
-        UnitStandard updated = unitStandardRepository.save(unitStandard);
-        return new ApiResponse<>(true, "Unit Standard updated successfully", new UnitStandardResponseDTO(updated));
-        
-    } catch (Exception e) {
-        return new ApiResponse<>(false, "Failed to update unit standard: " + e.getMessage(), null);
+            if (dto.getType() != null) {
+                unitStandard.setType(dto.getType());
+            }
+
+            UnitStandard updated = unitStandardRepository.save(unitStandard);
+            return new ApiResponse<>(true, "Unit Standard updated successfully", new UnitStandardResponseDTO(updated));
+
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to update unit standard: " + e.getMessage(), null);
+        }
     }
-}
 
     @Transactional
     public ApiResponse<?> delete(Long unitStandardId) {
@@ -205,4 +204,6 @@ public ApiResponse<?> update(Long unitStandardId, UnitStandardRequestDTO dto) {
                 .map(UnitStandardResponseDTO::new)
                 .collect(Collectors.toList());
     }
+
+    
 }

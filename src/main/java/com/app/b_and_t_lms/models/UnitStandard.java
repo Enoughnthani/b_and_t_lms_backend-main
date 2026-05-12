@@ -43,6 +43,9 @@ public class UnitStandard {
     @OneToMany(mappedBy = "unitStandard", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Content> contents = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "unitStandard", orphanRemoval = true)
+    List<Assessment> assessments;
+
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
@@ -54,7 +57,7 @@ public class UnitStandard {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
     }
-   
+
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
