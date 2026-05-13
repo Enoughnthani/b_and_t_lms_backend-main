@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/assessments")
 @RequiredArgsConstructor
+@PreAuthorize("hasRole('FACILITATOR,ASSESSOR,')")
 public class AssessmentController {
 
     private final AssessmentService assessmentService;
@@ -35,7 +36,6 @@ public class AssessmentController {
         return ResponseEntity.ok(response);
     }
 
-    // Get assessment by ID
     @GetMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR', 'LEARNER')")
     public ResponseEntity<ApiResponse<?>> getAssessmentById(@PathVariable Long id) {
@@ -43,7 +43,6 @@ public class AssessmentController {
         return ResponseEntity.ok(response);
     }
 
-    // Create assessment (with optional file upload)
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR')")
     public ResponseEntity<ApiResponse<?>> createAssessment(
@@ -54,12 +53,12 @@ public class AssessmentController {
             @RequestParam("type") String type,
             @RequestParam("unitStandardId") Long unitStandardId,
             @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
-        
-        ApiResponse<?> response = assessmentService.createAssessment(title, description, dueDate, totalMarks, type, unitStandardId, file);
+
+        ApiResponse<?> response = assessmentService.createAssessment(title, description, dueDate, totalMarks, type,
+                unitStandardId, file);
         return ResponseEntity.ok(response);
     }
 
-    // Update assessment (with optional file upload)
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR')")
     public ResponseEntity<ApiResponse<?>> updateAssessment(
@@ -71,12 +70,12 @@ public class AssessmentController {
             @RequestParam("type") String type,
             @RequestParam("unitStandardId") Long unitStandardId,
             @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
-        
-        ApiResponse<?> response = assessmentService.updateAssessment(id, title, description, dueDate, totalMarks, type, unitStandardId, file);
+
+        ApiResponse<?> response = assessmentService.updateAssessment(id, title, description, dueDate, totalMarks, type,
+                unitStandardId, file);
         return ResponseEntity.ok(response);
     }
 
-    // Delete assessment
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR')")
     public ResponseEntity<ApiResponse<?>> deleteAssessment(@PathVariable Long id) {
@@ -84,7 +83,6 @@ public class AssessmentController {
         return ResponseEntity.ok(response);
     }
 
-    // Get submissions for an assessment
     @GetMapping("/{assessmentId}/submissions")
     @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR')")
     public ResponseEntity<ApiResponse<?>> getSubmissions(@PathVariable Long assessmentId) {
@@ -92,21 +90,28 @@ public class AssessmentController {
         return ResponseEntity.ok(response);
     }
 
-    // Download assessment file (for learners)
     @GetMapping("/download/{filename}")
     @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR', 'LEARNER')")
     public ResponseEntity<?> downloadAssessmentFile(@PathVariable String filename) throws IOException {
         return assessmentService.downloadAssessmentFile(filename);
     }
 
-    // Submit learner's completed assessment
     @PostMapping(value = "/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('LEARNER')")
     public ResponseEntity<ApiResponse<?>> submitAssessment(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("assessmentId") Long assessmentId,Authentication  authentication) throws IOException {
-        
-        ApiResponse<?> response = assessmentService.submitAssessment(file, assessmentId,authentication);
+            @RequestParam("assessmentId") Long assessmentId, Authentication authentication) throws IOException {
+
+        ApiResponse<?> response = assessmentService.submitAssessment(file, assessmentId, authentication);
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/{assessmentId}/submission")
+    @PreAuthorize("hasRole('LEARNER')")
+    public ResponseEntity<ApiResponse<?>> getMySubmission(
+            @PathVariable Long assessmentId,
+            Authentication authentication) {
+        ApiResponse<?> response = assessmentService.getUserSubmission(assessmentId, authentication);
         return ResponseEntity.ok(response);
     }
 }

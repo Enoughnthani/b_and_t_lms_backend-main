@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -23,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.app.b_and_t_lms.dto.ApiResponse;
 import com.app.b_and_t_lms.dto.AssessmentResponseDTO;
+import com.app.b_and_t_lms.dto.AssessmentSubmissionDTO;
 import com.app.b_and_t_lms.models.Assessment;
 import com.app.b_and_t_lms.models.AssessmentSubmission;
 import com.app.b_and_t_lms.models.UnitStandard;
@@ -88,7 +90,6 @@ public class AssessmentService {
             assessment.setUnitStandard(unitStandard);
             assessment.setAssessmentSubmission(new ArrayList<>());
 
-            
             if (file != null && !file.isEmpty()) {
                 String savedFileName = saveFile(file, ASSESSMENT_DIR);
                 assessment.setFileUrl("/uploads/" + ASSESSMENT_DIR + savedFileName);
@@ -186,14 +187,14 @@ public class AssessmentService {
     }
 
     @Transactional
-    public ApiResponse<?> submitAssessment(MultipartFile file, Long assessmentId,Authentication authentication) {
+    public ApiResponse<?> submitAssessment(MultipartFile file, Long assessmentId, Authentication authentication) {
         try {
             Assessment assessment = assessmentRepository.findById(assessmentId)
                     .orElseThrow(() -> new RuntimeException("Assessment not found"));
 
             // Get the currently authenticated user
             String email = authentication.getName();
-            
+
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
@@ -201,7 +202,7 @@ public class AssessmentService {
 
             AssessmentSubmission submission = new AssessmentSubmission();
             submission.setAssessment(assessment);
-            submission.setUser(user); // Set the user
+            submission.setUser(user);
             submission.setFileUrl("/uploads/" + SUBMISSION_DIR + savedFileName);
             submission.setFileName(file.getOriginalFilename());
             submission.setFileSize(file.getSize());
@@ -210,7 +211,20 @@ public class AssessmentService {
             submissionRepository.save(submission);
             return new ApiResponse<>(true, "Assessment submitted successfully", null);
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to submit assessment: " + e.getMessage(), null);
+
+            Throwable root = e;
+
+            while (root.getCause() != null) {
+                root = root.getCause();
+            }
+
+            String message = root.getMessage();
+
+            if (message.contains("Duplicate entry")) {
+                message = "You have already submitted this assessment.";
+            }
+
+            return new ApiResponse<>(false, message, null);
         }
     }
 
@@ -234,6 +248,28 @@ public class AssessmentService {
             String relativePath = fileUrl.substring(fileUrl.indexOf("/uploads/") + 9);
             Path filePath = Paths.get(UPLOAD_BASE_DIR + relativePath);
             Files.deleteIfExists(filePath);
+        }
+    }
+
+    public ApiResponse<?> getUserSubmission(Long assessmentId, Authentication authentication) {
+        try {
+            String email = authentication.getName();
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            Assessment assessment = assessmentRepository.findById(assessmentId)
+                    .orElseThrow(() -> new RuntimeException("Assessment not found"));
+
+
+            Optional<AssessmentSubmission> submission = submissionRepository.findByAssessmentAndUser(assessment, user);
+
+            if (submission.isPresent()) {
+                return new ApiResponse<>(true, "Submission found", new AssessmentSubmissionDTO(submission.get()));
+            } else {
+                return new ApiResponse<>(true, "No submission found", null);
+            }
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to get submission: " + e.getMessage(), null);
         }
     }
 }
