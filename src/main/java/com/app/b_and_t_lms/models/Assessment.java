@@ -14,7 +14,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -55,8 +55,8 @@ public class Assessment {
     @JoinColumn(name = "unit_standard_id")
     private UnitStandard unitStandard;
 
-    @OneToMany(cascade = CascadeType.ALL, mappedBy = "assessment", orphanRemoval = true)
-    List<AssessmentSubmission> assessmentSubmission;
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "assessment", orphanRemoval = true)
+    AssessmentSubmission assessmentSubmission;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

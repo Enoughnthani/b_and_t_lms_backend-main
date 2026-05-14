@@ -10,14 +10,16 @@ import java.time.LocalDateTime;
 public class AssessmentSubmission {
 
     public enum SubmissionStatus {
-        SUBMITTED, GRADED, RETURNED
+        SUBMITTED,
+        GRADED,
+        RE_SUBMITTED
     }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "assessment_id")
     private Assessment assessment;
 
@@ -36,6 +38,7 @@ public class AssessmentSubmission {
     private String feedback;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 50)
     private SubmissionStatus status;
 
     private LocalDateTime submittedAt;
@@ -46,4 +49,11 @@ public class AssessmentSubmission {
         submittedAt = LocalDateTime.now();
         status = SubmissionStatus.SUBMITTED;
     }
+
+    @PreUpdate
+    protected void onUpdate() {
+        submittedAt = LocalDateTime.now();
+        status = SubmissionStatus.RE_SUBMITTED;
+    }
+
 }

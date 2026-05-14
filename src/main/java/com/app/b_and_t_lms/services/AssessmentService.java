@@ -6,7 +6,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -61,6 +60,35 @@ public class AssessmentService {
         }
     }
 
+    public ApiResponse<?> getAssessmentsByUnitStandard(Long unitStandardId, Authentication authentication) {
+        try {
+            String email = authentication.getName();
+            User currentUser = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+            List<Assessment> assessments = assessmentRepository.findByUnitStandardUnitStandardId(unitStandardId);
+            List<AssessmentResponseDTO> dtos = assessments.stream().map(assessment -> {
+                AssessmentResponseDTO dto = new AssessmentResponseDTO(assessment);
+
+                Boolean found = assessment.getAssessmentSubmission() != null
+                        && assessment.getAssessmentSubmission().getUser().equals(currentUser);
+
+                
+                if(!found){
+                  dto.setSubmission(null);
+                  dto.setHasSubmission(false);   
+                }
+
+                return dto;
+
+            }).toList();
+
+            return new ApiResponse<>(true, "Assessments retrieved successfully", dtos);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to retrieve assessments: " + e.getMessage(), null);
+        }
+    }
+
     public ApiResponse<?> getAssessmentById(Long id) {
         try {
             Assessment assessment = assessmentRepository.findById(id)
@@ -88,7 +116,6 @@ public class AssessmentService {
             assessment.setTotalMarks(totalMarks);
             assessment.setType(Assessment.AssessmentType.valueOf(type));
             assessment.setUnitStandard(unitStandard);
-            assessment.setAssessmentSubmission(new ArrayList<>());
 
             if (file != null && !file.isEmpty()) {
                 String savedFileName = saveFile(file, ASSESSMENT_DIR);
@@ -156,7 +183,8 @@ public class AssessmentService {
 
     public ApiResponse<?> getSubmissions(Long assessmentId) {
         try {
-            List<AssessmentSubmission> submissions = submissionRepository.findByAssessmentId(assessmentId);
+            List<AssessmentSubmissionDTO> submissions = submissionRepository.findByAssessmentId(assessmentId).stream()
+                    .map(AssessmentSubmissionDTO::new).toList();
             return new ApiResponse<>(true, "Submissions retrieved successfully", submissions);
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to retrieve submissions: " + e.getMessage(), null);
@@ -192,17 +220,25 @@ public class AssessmentService {
             Assessment assessment = assessmentRepository.findById(assessmentId)
                     .orElseThrow(() -> new RuntimeException("Assessment not found"));
 
-            // Get the currently authenticated user
             String email = authentication.getName();
 
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("User not found"));
 
+            AssessmentSubmission submission = submissionRepository.findByAssessmentAndUser(assessment, user)
+                    .orElse(null);
+
+            if (submission == null) {
+                submission = new AssessmentSubmission();
+                submission.setAssessment(assessment);
+                submission.setUser(user);
+            } else {
+
+                deleteOldFile(assessment.getFileUrl());
+            }
+
             String savedFileName = saveFile(file, SUBMISSION_DIR);
 
-            AssessmentSubmission submission = new AssessmentSubmission();
-            submission.setAssessment(assessment);
-            submission.setUser(user);
             submission.setFileUrl("/uploads/" + SUBMISSION_DIR + savedFileName);
             submission.setFileName(file.getOriginalFilename());
             submission.setFileSize(file.getSize());
@@ -259,7 +295,6 @@ public class AssessmentService {
 
             Assessment assessment = assessmentRepository.findById(assessmentId)
                     .orElseThrow(() -> new RuntimeException("Assessment not found"));
-
 
             Optional<AssessmentSubmission> submission = submissionRepository.findByAssessmentAndUser(assessment, user);
 
