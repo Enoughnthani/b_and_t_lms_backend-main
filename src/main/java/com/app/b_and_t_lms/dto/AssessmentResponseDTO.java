@@ -22,8 +22,9 @@ public class AssessmentResponseDTO {
     private String unitStandardTitle;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private AssessmentSubmissionDTO submission;
     private Boolean hasSubmission;
+    private Integer submittedCount;
+    private AssessmentSubmissionDTO submission;
 
     public AssessmentResponseDTO(Assessment assessment) {
         this.id = assessment.getId();
@@ -35,17 +36,13 @@ public class AssessmentResponseDTO {
         this.fileUrl = assessment.getFileUrl();
         this.fileName = assessment.getFileName();
         this.fileSize = assessment.getFileSize();
-        this.unitStandardId = assessment.getUnitStandard() != null ? assessment.getUnitStandard().getUnitStandardId() : null;
+        this.unitStandardId = assessment.getUnitStandard() != null ? assessment.getUnitStandard().getUnitStandardId()
+                : null;
         this.unitStandardTitle = assessment.getUnitStandard() != null ? assessment.getUnitStandard().getTitle() : null;
         this.createdAt = assessment.getCreatedAt();
         this.updatedAt = assessment.getUpdatedAt();
-   
-        if (assessment.getAssessmentSubmission() != null) {
-            this.submission = new AssessmentSubmissionDTO(assessment.getAssessmentSubmission());
-            this.hasSubmission = true;
-        } else {
-            this.submission = null;
-            this.hasSubmission = false;
-        }
+        this.hasSubmission = assessment.getSubmissions() != null && !assessment.getSubmissions().isEmpty();
+        this.submittedCount = hasSubmission ? assessment.getSubmissions().size() : 0;
+        
     }
 }

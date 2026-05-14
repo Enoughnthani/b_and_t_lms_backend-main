@@ -75,7 +75,7 @@ public class EnrollmentService {
 
             User user = userRepository.findById(dto.getUserId()).orElse(null);
 
-             if (user == null) {
+            if (user == null) {
                 return new ApiResponse<>(false, "User not found", null);
             }
 
@@ -91,7 +91,7 @@ public class EnrollmentService {
 
             enrollmentRepository.deleteByUserId(dto.getUserId());
 
-            return new ApiResponse<>(true, user.getFirstname()+" removed.", new ProgramDTO(program));
+            return new ApiResponse<>(true, user.getFirstname() + " removed.", new ProgramDTO(program));
 
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to remove user from program " + e.getMessage(), null);
@@ -164,6 +164,14 @@ public class EnrollmentService {
 
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed: ", null);
+        }
+    }
+
+    public ApiResponse<?> countByProgramId(Long programId) {
+        try {
+            return new ApiResponse<>(true, "Total enrolled learners", enrollmentRepository.countByProgramId(programId));
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Request Failed", null);
         }
     }
 }

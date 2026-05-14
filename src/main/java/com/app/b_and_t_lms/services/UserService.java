@@ -760,4 +760,19 @@ public class UserService {
     private String getRole(List<RoleName> roles, int i) {
         return roles.get(i).toString().toLowerCase();
     }
+
+    public ApiResponse<?> getUserById(Long userId) {
+        try {
+
+            User user = userRepository.findById(userId).orElse(null);
+
+            if (user == null) {
+                return new ApiResponse<>(false, "Failed to get user", null);
+            }
+
+            return new ApiResponse<>(true, "user", new UserData(user));
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to get user", null);
+        }
+    }
 }

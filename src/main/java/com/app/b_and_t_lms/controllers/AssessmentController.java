@@ -29,17 +29,11 @@ public class AssessmentController {
 
     private final AssessmentService assessmentService;
 
-    @GetMapping("/unit-standard/{unitStandardId}/facilitator")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR')")
-    public ResponseEntity<ApiResponse<?>> getAssessmentsByUnitStandard(@PathVariable Long unitStandardId) {
-        ApiResponse<?> response = assessmentService.getAssessmentsByUnitStandard(unitStandardId);
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/unit-standard/{unitStandardId}/learner")
-    @PreAuthorize("hasAnyRole('LEARNER')")
-    public ResponseEntity<ApiResponse<?>> getAssessmentsByUnitStandard(@PathVariable Long unitStandardId,Authentication authentication) {
-        ApiResponse<?> response = assessmentService.getAssessmentsByUnitStandard(unitStandardId,authentication);
+    @GetMapping("/unit-standard/{unitStandardId}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR','LEARNER')")
+    public ResponseEntity<ApiResponse<?>> getAssessmentsByUnitStandard(@PathVariable Long unitStandardId,
+            Authentication authentication) {
+        ApiResponse<?> response = assessmentService.getAssessmentsByUnitStandard(unitStandardId, authentication);
         return ResponseEntity.ok(response);
     }
 
@@ -121,4 +115,6 @@ public class AssessmentController {
         ApiResponse<?> response = assessmentService.getUserSubmission(assessmentId, authentication);
         return ResponseEntity.ok(response);
     }
+
+   
 }

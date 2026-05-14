@@ -50,6 +50,11 @@ public class UserController {
         return userService.getAllLeaners();
     }
 
+    @GetMapping("/{userId}")
+    public ApiResponse<?> getUserById(@PathVariable Long userId) {
+        return userService.getUserById(userId);
+    }
+
     @GetMapping("/interns")
     @PreAuthorize("hasRole('PROGRAM_MANAGER')")
     public ApiResponse<?> getInterns() {

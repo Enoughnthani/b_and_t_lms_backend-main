@@ -9,7 +9,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -48,42 +47,27 @@ public class AssessmentService {
     private static final String ASSESSMENT_DIR = "assessments/";
     private static final String SUBMISSION_DIR = "submissions/";
 
-    public ApiResponse<?> getAssessmentsByUnitStandard(Long unitStandardId) {
-        try {
-            List<Assessment> assessments = assessmentRepository.findByUnitStandardUnitStandardId(unitStandardId);
-            List<AssessmentResponseDTO> dtos = assessments.stream()
-                    .map(AssessmentResponseDTO::new)
-                    .collect(Collectors.toList());
-            return new ApiResponse<>(true, "Assessments retrieved successfully", dtos);
-        } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to retrieve assessments: " + e.getMessage(), null);
-        }
-    }
-
     public ApiResponse<?> getAssessmentsByUnitStandard(Long unitStandardId, Authentication authentication) {
         try {
-            String email = authentication.getName();
-            User currentUser = userRepository.findByEmail(email)
-                    .orElseThrow(() -> new RuntimeException("User not found"));
+            User user = (User) authentication.getPrincipal();
 
             List<Assessment> assessments = assessmentRepository.findByUnitStandardUnitStandardId(unitStandardId);
-            List<AssessmentResponseDTO> dtos = assessments.stream().map(assessment -> {
-                AssessmentResponseDTO dto = new AssessmentResponseDTO(assessment);
+            List<AssessmentResponseDTO> dtos = assessments.stream()
+                    .map(assessment -> {
+                        AssessmentResponseDTO dto = new AssessmentResponseDTO(assessment);
 
-                Boolean found = assessment.getAssessmentSubmission() != null
-                        && assessment.getAssessmentSubmission().getUser().equals(currentUser);
+                        AssessmentSubmission submission = assessment.getSubmissions().stream()
+                                .filter(s -> s.getUser().equals(user)).findFirst().orElse(null);
 
-                
-                if(!found){
-                  dto.setSubmission(null);
-                  dto.setHasSubmission(false);   
-                }
+                        if (submission != null) {
+                            dto.setSubmission(new AssessmentSubmissionDTO(submission));
+                        }
 
-                return dto;
+                        return dto;
 
-            }).toList();
+                    }).toList();
 
-            return new ApiResponse<>(true, "Assessments retrieved successfully", dtos);
+            return new ApiResponse<>(true, "Assessments retrieved successfully ", dtos);
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to retrieve assessments: " + e.getMessage(), null);
         }

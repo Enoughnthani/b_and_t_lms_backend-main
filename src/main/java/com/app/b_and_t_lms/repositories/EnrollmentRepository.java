@@ -20,4 +20,6 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, Long> {
     @Modifying
     @Query("DELETE FROM Enrollment e WHERE e.user.id = :userId")
     int deleteByUserId(@Param("userId") Long userId);
+
+    Integer countByProgramId(Long programId);
 }

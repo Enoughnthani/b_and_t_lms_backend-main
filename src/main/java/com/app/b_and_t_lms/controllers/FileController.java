@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class FileController {
 
     private static final String ASSESSMENTS_DIR = "C:/uploads/assessments/";
+    private static final String SUBMISSIONS_DIR = "C:/uploads/submissions/";
     private static final String CONTENT_DIR = "C:/uploads/content/";
     private static final String PROGRAMS_DIR = "C:/uploads/programs/";
 
@@ -32,12 +33,30 @@ public class FileController {
     public ResponseEntity<Resource> downloadAssessmentFile(
             @PathVariable String filename,
             @RequestParam(required = false) String originalName) throws IOException {
-        
+
         String decodedName = null;
         if (originalName != null && !originalName.isEmpty()) {
             decodedName = URLDecoder.decode(originalName, StandardCharsets.UTF_8.toString());
         }
         return serveFile(ASSESSMENTS_DIR, filename, "attachment", decodedName);
+    }
+
+    // For /uploads/submissions/ path
+    @GetMapping("/uploads/submissions/{filename}")
+    public ResponseEntity<Resource> getSubmissionFile(@PathVariable String filename) throws IOException {
+        return serveFile(SUBMISSIONS_DIR, filename, "inline", null);
+    }
+
+    @GetMapping("/uploads/submissions/{filename}/download")
+    public ResponseEntity<Resource> downloadSubmissionFile(
+            @PathVariable String filename,
+            @RequestParam(required = false) String originalName) throws IOException {
+
+        String decodedName = null;
+        if (originalName != null && !originalName.isEmpty()) {
+            decodedName = URLDecoder.decode(originalName, StandardCharsets.UTF_8.toString());
+        }
+        return serveFile(SUBMISSIONS_DIR, filename, "attachment", decodedName);
     }
 
     // For /uploads/content/ path
@@ -50,7 +69,7 @@ public class FileController {
     public ResponseEntity<Resource> downloadContentFile(
             @PathVariable String filename,
             @RequestParam(required = false) String originalName) throws IOException {
-        
+
         String decodedName = null;
         if (originalName != null && !originalName.isEmpty()) {
             decodedName = URLDecoder.decode(originalName, StandardCharsets.UTF_8.toString());
@@ -67,7 +86,7 @@ public class FileController {
     public ResponseEntity<Resource> downloadProgramFile(
             @PathVariable String filename,
             @RequestParam(required = false) String originalName) throws IOException {
-        
+
         String decodedName = null;
         if (originalName != null && !originalName.isEmpty()) {
             decodedName = URLDecoder.decode(originalName, StandardCharsets.UTF_8.toString());
@@ -75,7 +94,8 @@ public class FileController {
         return serveFile(PROGRAMS_DIR, filename, "attachment", decodedName);
     }
 
-    private ResponseEntity<Resource> serveFile(String dir, String filename, String disposition, String originalName) throws IOException {
+    private ResponseEntity<Resource> serveFile(String dir, String filename, String disposition, String originalName)
+            throws IOException {
         Path path = Paths.get(dir).resolve(filename).normalize();
         Resource resource = new UrlResource(path.toUri());
 
@@ -93,7 +113,7 @@ public class FileController {
                     }
                 });
 
-        // Use original name for download, otherwise use UUID filename
+     
         String downloadFileName;
         if ("attachment".equals(disposition) && originalName != null && !originalName.isEmpty()) {
             downloadFileName = originalName;

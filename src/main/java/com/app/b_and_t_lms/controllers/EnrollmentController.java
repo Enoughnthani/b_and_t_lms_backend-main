@@ -37,4 +37,10 @@ public class EnrollmentController {
     public ApiResponse<?> bulkRemove(@Valid @RequestBody EnrollmentRequestDTO dto) {
         return enrollmentService.bulkRemove(dto);
     }
+
+    @GetMapping("/count/{programId}")
+    @PreAuthorize("hasRole('FACILITATOR')")
+    public ApiResponse<?> count(@PathVariable Long programId) {
+        return enrollmentService.countByProgramId(programId);
+    }
 }

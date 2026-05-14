@@ -39,7 +39,7 @@ public class ProgramController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('FACILITATOR')")
+    @PreAuthorize("hasAnyRole('FACILITATOR','PROGRAM_MANAGER')")
     public ApiResponse<?> getProgramById(@PathVariable Long id) {
         return programService.getProgramById(id);
     }
