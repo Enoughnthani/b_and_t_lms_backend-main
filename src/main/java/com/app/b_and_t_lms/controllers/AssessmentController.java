@@ -8,6 +8,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.app.b_and_t_lms.dto.ApiResponse;
+import com.app.b_and_t_lms.dto.AssessmentRequestDTO;
 import com.app.b_and_t_lms.services.AssessmentService;
 
 import lombok.RequiredArgsConstructor;
@@ -46,34 +48,17 @@ public class AssessmentController {
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR')")
-    public ResponseEntity<ApiResponse<?>> createAssessment(
-            @RequestParam("title") String title,
-            @RequestParam(value = "description", required = false) String description,
-            @RequestParam(value = "dueDate", required = false) String dueDate,
-            @RequestParam("totalMarks") Integer totalMarks,
-            @RequestParam("type") String type,
-            @RequestParam("unitStandardId") Long unitStandardId,
-            @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
-
-        ApiResponse<?> response = assessmentService.createAssessment(title, description, dueDate, totalMarks, type,
-                unitStandardId, file);
+    public ResponseEntity<ApiResponse<?>> createAssessment(@ModelAttribute AssessmentRequestDTO dto)
+            throws IOException {
+        ApiResponse<?> response = assessmentService.createAssessment(dto);
         return ResponseEntity.ok(response);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR')")
-    public ResponseEntity<ApiResponse<?>> updateAssessment(
-            @PathVariable Long id,
-            @RequestParam("title") String title,
-            @RequestParam(value = "description", required = false) String description,
-            @RequestParam(value = "dueDate", required = false) String dueDate,
-            @RequestParam("totalMarks") Integer totalMarks,
-            @RequestParam("type") String type,
-            @RequestParam("unitStandardId") Long unitStandardId,
-            @RequestParam(value = "file", required = false) MultipartFile file) throws IOException {
+    public ResponseEntity<ApiResponse<?>> updateAssessment(@PathVariable Long id,@ModelAttribute AssessmentRequestDTO dto) throws IOException {
 
-        ApiResponse<?> response = assessmentService.updateAssessment(id, title, description, dueDate, totalMarks, type,
-                unitStandardId, file);
+        ApiResponse<?> response = assessmentService.updateAssessment(id,dto);
         return ResponseEntity.ok(response);
     }
 
@@ -115,6 +100,4 @@ public class AssessmentController {
         ApiResponse<?> response = assessmentService.getUserSubmission(assessmentId, authentication);
         return ResponseEntity.ok(response);
     }
-
-   
 }

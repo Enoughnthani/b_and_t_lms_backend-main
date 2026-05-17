@@ -4,8 +4,10 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,16 +23,25 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.app.b_and_t_lms.dto.ApiResponse;
+import com.app.b_and_t_lms.dto.AssessmentRequestDTO;
+import com.app.b_and_t_lms.dto.AssessmentRequestDTO.MatchingPairDTO;
+import com.app.b_and_t_lms.dto.AssessmentRequestDTO.OptionDTO;
+import com.app.b_and_t_lms.dto.AssessmentRequestDTO.QuestionDTO;
 import com.app.b_and_t_lms.dto.AssessmentResponseDTO;
 import com.app.b_and_t_lms.dto.AssessmentSubmissionDTO;
 import com.app.b_and_t_lms.models.Assessment;
+import com.app.b_and_t_lms.models.AssessmentQuestion;
 import com.app.b_and_t_lms.models.AssessmentSubmission;
+import com.app.b_and_t_lms.models.MatchingPair;
+import com.app.b_and_t_lms.models.QuestionOption;
 import com.app.b_and_t_lms.models.UnitStandard;
 import com.app.b_and_t_lms.models.User;
 import com.app.b_and_t_lms.repositories.AssessmentRepository;
 import com.app.b_and_t_lms.repositories.AssessmentSubmissionRepository;
 import com.app.b_and_t_lms.repositories.UnitStandardRepository;
 import com.app.b_and_t_lms.repositories.UserRepository;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import lombok.RequiredArgsConstructor;
 
@@ -80,71 +91,6 @@ public class AssessmentService {
             return new ApiResponse<>(true, "Assessment retrieved successfully", new AssessmentResponseDTO(assessment));
         } catch (Exception e) {
             return new ApiResponse<>(false, "Failed to retrieve assessment: " + e.getMessage(), null);
-        }
-    }
-
-    @Transactional
-    public ApiResponse<?> createAssessment(String title, String description, String dueDateStr,
-            Integer totalMarks, String type, Long unitStandardId,
-            MultipartFile file) throws IOException {
-        try {
-            UnitStandard unitStandard = unitStandardRepository.findById(unitStandardId)
-                    .orElseThrow(() -> new RuntimeException("Unit Standard not found"));
-
-            Assessment assessment = new Assessment();
-            assessment.setTitle(title);
-            assessment.setDescription(description);
-            if (dueDateStr != null && !dueDateStr.isEmpty()) {
-                assessment.setDueDate(LocalDate.parse(dueDateStr, DateTimeFormatter.ISO_LOCAL_DATE));
-            }
-            assessment.setTotalMarks(totalMarks);
-            assessment.setType(Assessment.AssessmentType.valueOf(type));
-            assessment.setUnitStandard(unitStandard);
-
-            if (file != null && !file.isEmpty()) {
-                String savedFileName = saveFile(file, ASSESSMENT_DIR);
-                assessment.setFileUrl("/uploads/" + ASSESSMENT_DIR + savedFileName);
-                assessment.setFileName(file.getOriginalFilename());
-                assessment.setFileSize(file.getSize());
-            }
-
-            Assessment saved = assessmentRepository.save(assessment);
-            return new ApiResponse<>(true, "Assessment created successfully", new AssessmentResponseDTO(saved));
-        } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to create assessment: " + e.getMessage(), null);
-        }
-    }
-
-    @Transactional
-    public ApiResponse<?> updateAssessment(Long id, String title, String description, String dueDateStr,
-            Integer totalMarks, String type, Long unitStandardId,
-            MultipartFile file) throws IOException {
-        try {
-            Assessment assessment = assessmentRepository.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Assessment not found"));
-
-            assessment.setTitle(title);
-            assessment.setDescription(description);
-            if (dueDateStr != null && !dueDateStr.isEmpty()) {
-                assessment.setDueDate(LocalDate.parse(dueDateStr, DateTimeFormatter.ISO_LOCAL_DATE));
-            }
-            assessment.setTotalMarks(totalMarks);
-            assessment.setType(Assessment.AssessmentType.valueOf(type));
-
-            if (file != null && !file.isEmpty()) {
-                if (assessment.getFileUrl() != null) {
-                    deleteOldFile(assessment.getFileUrl());
-                }
-                String savedFileName = saveFile(file, ASSESSMENT_DIR);
-                assessment.setFileUrl("/uploads/" + ASSESSMENT_DIR + savedFileName);
-                assessment.setFileName(file.getOriginalFilename());
-                assessment.setFileSize(file.getSize());
-            }
-
-            Assessment saved = assessmentRepository.save(assessment);
-            return new ApiResponse<>(true, "Assessment updated successfully", new AssessmentResponseDTO(saved));
-        } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to update assessment: " + e.getMessage(), null);
         }
     }
 
@@ -291,4 +237,268 @@ public class AssessmentService {
             return new ApiResponse<>(false, "Failed to get submission: " + e.getMessage(), null);
         }
     }
+
+    @Transactional
+    public ApiResponse<?> createAssessment(AssessmentRequestDTO dto) throws IOException {
+        try {
+
+            UnitStandard unitStandard = unitStandardRepository.findById(dto.getUnitStandardId())
+                    .orElseThrow(() -> new RuntimeException("Unit Standard not found"));
+
+            Assessment assessment = new Assessment();
+            assessment.setTitle(dto.getTitle());
+            assessment.setDescription(dto.getDescription());
+
+            ApiResponse<?> dateValidationResponse = validateAndSetDates(assessment, dto);
+            if (dateValidationResponse != null) {
+                return dateValidationResponse;
+            }
+
+            assessment.setTotalMarks(dto.getTotalMarks());
+            assessment.setType(Assessment.AssessmentType.valueOf(dto.getType()));
+            assessment.setUnitStandard(unitStandard);
+
+            if (dto.getDurationMinutes() != null) {
+                assessment.setDurationMinutes(dto.getDurationMinutes());
+            }
+
+            if (dto.getPassingMarks() != null) {
+                assessment.setPassingMarks(dto.getPassingMarks());
+            }
+
+            if (dto.getFile() != null && !dto.getFile().isEmpty()) {
+                String savedFileName = saveFile(dto.getFile(), ASSESSMENT_DIR);
+                assessment.setFileUrl("/uploads/" + ASSESSMENT_DIR + savedFileName);
+                assessment.setFileName(dto.getFile().getOriginalFilename());
+                assessment.setFileSize(dto.getFile().getSize());
+            }
+
+            if (dto.getQuestions() != null && !dto.getQuestions().isEmpty()) {
+                List<AssessmentQuestion> assessmentQuestions = new ArrayList<>();
+                int order = 0;
+
+                ObjectMapper mapper = new ObjectMapper();
+                List<AssessmentRequestDTO.QuestionDTO> questionList = mapper.readValue(
+                        dto.getQuestions(),
+                        new TypeReference<List<AssessmentRequestDTO.QuestionDTO>>() {
+                        });
+
+                for (QuestionDTO qDto : questionList) {
+                    AssessmentQuestion question = new AssessmentQuestion();
+                    question.setType(AssessmentQuestion.QuestionType.valueOf(qDto.getType().toUpperCase()));
+                    question.setText(qDto.getText());
+                    question.setMarks(qDto.getMarks());
+                    question.setExplanation(qDto.getExplanation());
+                    question.setCorrectAnswer(qDto.getCorrectAnswer());
+                    question.setSampleAnswer(qDto.getSampleAnswer());
+                    question.setDisplayOrder(order++);
+                    question.setAssessment(assessment);
+
+                    if (qDto.getOptions() != null && !qDto.getOptions().isEmpty()) {
+                        int optOrder = 0;
+                        for (OptionDTO oDto : qDto.getOptions()) {
+                            QuestionOption option = new QuestionOption();
+                            option.setText(oDto.getText());
+                            option.setDisplayOrder(optOrder++);
+                            option.setQuestion(question);
+                            question.getOptions().add(option);
+                        }
+                    }
+
+                    if (qDto.getMatchingPairs() != null && !qDto.getMatchingPairs().isEmpty()) {
+                        int pairOrder = 0;
+                        for (MatchingPairDTO mDto : qDto.getMatchingPairs()) {
+                            MatchingPair pair = new MatchingPair();
+                            pair.setLeftItem(mDto.getLeftItem());
+                            pair.setRightItem(mDto.getRightItem());
+                            pair.setDisplayOrder(pairOrder++);
+                            pair.setQuestion(question);
+                            question.getMatchingPairs().add(pair);
+                        }
+                    }
+
+                    assessmentQuestions.add(question);
+                }
+                assessment.setQuestions(assessmentQuestions);
+            }
+
+            Assessment savedAssessment = assessmentRepository.save(assessment);
+
+            String message = assessment.getType() == Assessment.AssessmentType.TEST && assessment.getQuestions() != null
+                    ? "Test assessment saved successfully with " + assessment.getQuestions().size() + " questions"
+                    : "Assessment created successfully";
+
+            return new ApiResponse<>(true, message, new AssessmentResponseDTO(savedAssessment));
+
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to create assessment: " + e.getMessage(), null);
+        }
+    }
+
+    @Transactional
+    public ApiResponse<?> updateAssessment(Long id, AssessmentRequestDTO dto) throws IOException {
+        try {
+            Assessment assessment = assessmentRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Assessment not found"));
+
+            assessment.setTitle(dto.getTitle());
+            assessment.setDescription(dto.getDescription());
+
+            ApiResponse<?> dateValidationResponse = validateAndSetDates(assessment, dto);
+            if (dateValidationResponse != null) {
+                return dateValidationResponse;
+            }
+
+            assessment.setTotalMarks(dto.getTotalMarks());
+            assessment.setType(Assessment.AssessmentType.valueOf(dto.getType()));
+
+            if (dto.getDurationMinutes() != null) {
+                assessment.setDurationMinutes(dto.getDurationMinutes());
+            }
+
+            if (dto.getPassingMarks() != null) {
+                assessment.setPassingMarks(dto.getPassingMarks());
+            }
+
+            if (dto.getFile() != null && !dto.getFile().isEmpty()) {
+                if (assessment.getFileUrl() != null) {
+                    deleteOldFile(assessment.getFileUrl());
+                }
+                String savedFileName = saveFile(dto.getFile(), ASSESSMENT_DIR);
+                assessment.setFileUrl("/uploads/" + ASSESSMENT_DIR + savedFileName);
+                assessment.setFileName(dto.getFile().getOriginalFilename());
+                assessment.setFileSize(dto.getFile().getSize());
+            }
+
+            if (dto.getQuestions() != null && !dto.getQuestions().isEmpty()) {
+                ObjectMapper mapper = new ObjectMapper();
+                List<AssessmentRequestDTO.QuestionDTO> questionList = mapper.readValue(
+                        dto.getQuestions(),
+                        new TypeReference<List<AssessmentRequestDTO.QuestionDTO>>() {
+                        });
+
+                assessment.getQuestions().clear();
+
+                int order = 0;
+
+                for (AssessmentRequestDTO.QuestionDTO qDto : questionList) {
+                    AssessmentQuestion question = new AssessmentQuestion();
+                    question.setType(AssessmentQuestion.QuestionType.valueOf(qDto.getType()));
+                    question.setText(qDto.getText());
+                    question.setMarks(qDto.getMarks());
+                    question.setExplanation(qDto.getExplanation());
+                    question.setCorrectAnswer(qDto.getCorrectAnswer());
+                    question.setSampleAnswer(qDto.getSampleAnswer());
+                    question.setDisplayOrder(order++);
+                    question.setAssessment(assessment);
+
+                    if (question.getOptions() == null) {
+                        question.setOptions(new ArrayList<>());
+                    }
+                    if (question.getMatchingPairs() == null) {
+                        question.setMatchingPairs(new ArrayList<>());
+                    }
+
+                    if (qDto.getOptions() != null && !qDto.getOptions().isEmpty()) {
+                        int optOrder = 0;
+                        for (AssessmentRequestDTO.OptionDTO oDto : qDto.getOptions()) {
+                            QuestionOption option = new QuestionOption();
+                            option.setText(oDto.getText());
+                            option.setDisplayOrder(optOrder++);
+                            option.setQuestion(question);
+                            question.getOptions().add(option);
+                        }
+                    }
+
+                    if (qDto.getMatchingPairs() != null && !qDto.getMatchingPairs().isEmpty()) {
+                        int pairOrder = 0;
+                        for (AssessmentRequestDTO.MatchingPairDTO mDto : qDto.getMatchingPairs()) {
+                            MatchingPair pair = new MatchingPair();
+                            pair.setLeftItem(mDto.getLeftItem());
+                            pair.setRightItem(mDto.getRightItem());
+                            pair.setDisplayOrder(pairOrder++);
+                            pair.setQuestion(question);
+                            question.getMatchingPairs().add(pair);
+                        }
+                    }
+
+                    assessment.getQuestions().add(question);
+                }
+            } else if (dto.getQuestions() != null && dto.getQuestions().isEmpty()) {
+                assessment.getQuestions().clear();
+            }
+
+            Assessment saved = assessmentRepository.save(assessment);
+            return new ApiResponse<>(true, "Assessment updated successfully " + dto.getStartDate(),
+                    new AssessmentResponseDTO(saved));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ApiResponse<>(false, "Failed to update assessment: " + e.getMessage(), null);
+        }
+    }
+
+    private ApiResponse<?> validateAndSetDates(
+            Assessment assessment,
+            AssessmentRequestDTO dto) {
+
+        LocalDateTime startDate = null;
+        LocalDateTime dueDate = null;
+        LocalDateTime today = LocalDateTime.now();
+
+        try {
+
+            if (dto.getStartDate() != null && !dto.getStartDate().isBlank()) {
+
+                startDate = LocalDateTime.parse(
+                        dto.getStartDate(),
+                        DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            }
+
+            if (dto.getDueDate() != null && !dto.getDueDate().isBlank()) {
+
+                dueDate = LocalDateTime.parse(
+                        dto.getDueDate(),
+                        DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+            }
+
+        } catch (DateTimeParseException e) {
+
+            return new ApiResponse<>(
+                    false,
+                    "Invalid date format. Please use YYYY-MM-DDTHH:mm",
+                    null);
+        }
+
+        
+
+        if (dueDate != null && dueDate.isBefore(today)) {
+
+            return new ApiResponse<>(
+                    false,
+                    String.format(
+                            "Due date (%s) cannot be in the past",
+                            dueDate),
+                    null);
+        }
+
+        if (startDate != null
+                && dueDate != null
+                && startDate.isAfter(dueDate)) {
+
+            return new ApiResponse<>(
+                    false,
+                    String.format(
+                            "Start date (%s) cannot be after due date (%s)",
+                            startDate,
+                            dueDate),
+                    null);
+        }
+
+        assessment.setStartDate(startDate);
+        assessment.setDueDate(dueDate);
+
+        return null;
+    }
+
 }

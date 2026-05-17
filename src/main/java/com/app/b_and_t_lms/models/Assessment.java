@@ -1,7 +1,7 @@
 package com.app.b_and_t_lms.models;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.persistence.CascadeType;
@@ -26,7 +26,11 @@ import lombok.Data;
 public class Assessment {
 
     public enum AssessmentType {
-        LEARNER_WORKBOOK, SUMMATIVE
+        LEARNER_WORKBOOK, SUMMATIVE, TEST
+    }
+
+    public enum AssessmentStatus {
+        CREATED, WRITTEN, MARKED
     }
 
     @Id
@@ -38,12 +42,23 @@ public class Assessment {
     @Column(length = 1000)
     private String description;
 
-    private LocalDate dueDate;
+    private LocalDateTime dueDate;
+
+    private LocalDateTime startDate;
 
     private Integer totalMarks;
+    
+    private Integer passingMarks;
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 100)
     private AssessmentType type;
+
+    private Integer durationMinutes;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 50)
+    private AssessmentStatus status;
 
     private String fileUrl;
 
@@ -56,7 +71,10 @@ public class Assessment {
     private UnitStandard unitStandard;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "assessment", orphanRemoval = true)
-    List<AssessmentSubmission> submissions;
+    private List<AssessmentSubmission> submissions = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "assessment", orphanRemoval = true)
+    private List<AssessmentQuestion> questions = new ArrayList<>();
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -65,10 +83,42 @@ public class Assessment {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        
+       
+        if (status == null) {
+            status = AssessmentStatus.CREATED;
+        }
+        
+        if (submissions == null) {
+            submissions = new ArrayList<>();
+        }
+        if (questions == null) {
+            questions = new ArrayList<>();
+        }
     }
 
     @PreUpdate
     protected void onUpdate() {
         updatedAt = LocalDateTime.now();
+    }
+    
+    public void addSubmission(AssessmentSubmission submission) {
+        submissions.add(submission);
+        submission.setAssessment(this);
+    }
+    
+    public void removeSubmission(AssessmentSubmission submission) {
+        submissions.remove(submission);
+        submission.setAssessment(null);
+    }
+    
+    public void addQuestion(AssessmentQuestion question) {
+        questions.add(question);
+        question.setAssessment(this);
+    }
+    
+    public void removeQuestion(AssessmentQuestion question) {
+        questions.remove(question);
+        question.setAssessment(null);
     }
 }
