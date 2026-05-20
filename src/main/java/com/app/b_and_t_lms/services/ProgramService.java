@@ -42,7 +42,7 @@ public class ProgramService {
             return new ApiResponse<>(true, "Program added successfully", program);
 
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to add program: " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to add program: " , null);
         }
     }
 
@@ -52,7 +52,7 @@ public class ProgramService {
             return new ApiResponse<>(true, "Programs fetched successfully", programs);
 
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to fetch programs " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to fetch programs " , null);
         }
     }
 
@@ -71,7 +71,7 @@ public class ProgramService {
             return new ApiResponse<>(true, "Program updated successfully", program);
 
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to update program " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to update program " , null);
         }
     }
 
@@ -164,7 +164,7 @@ public class ProgramService {
             return new ApiResponse<>(true, "Enrolled learners retrieved successfully",
                     enrolledLearners);
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to retrieve enrolled learners: " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to retrieve enrolled learners: " , null);
         }
     }
 

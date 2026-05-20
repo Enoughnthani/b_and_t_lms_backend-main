@@ -81,7 +81,7 @@ public class ProgramStaffService {
             return new ApiResponse<>(true, user.getFirstname() + " assigned", null);
 
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Assignment failed: " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Assignment failed: " , null);
         }
     }
 
@@ -134,7 +134,7 @@ public class ProgramStaffService {
             return new ApiResponse<>(true, count + " staff processed successfully ", null);
 
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Bulk assign failed: " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Bulk assign failed: " , null);
         }
     }
 
@@ -174,7 +174,7 @@ public class ProgramStaffService {
 
             return new ApiResponse<>(    true,role + " role unassigned.",new ProgramDTO(program));
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Remove failed: " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Remove failed: " , null);
         }
     }
 
@@ -223,7 +223,7 @@ public class ProgramStaffService {
             return new ApiResponse<>(true, count + " removed successfully", new ProgramDTO(program));
 
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Bulk remove failed: " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Bulk remove failed: " , null);
         }
     }
 }

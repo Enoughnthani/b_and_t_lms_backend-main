@@ -1,8 +1,10 @@
 package com.app.b_and_t_lms.dto;
 
-import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
+
+import org.springframework.web.multipart.MultipartFile;
+
+import lombok.Data;
 
 @Data
 public class AssessmentRequestDTO {
@@ -28,6 +30,7 @@ public class AssessmentRequestDTO {
         private String sampleAnswer;
         private List<OptionDTO> options;
         private List<MatchingPairDTO> matchingPairs;
+        private List<String> blanks;
         private Integer displayOrder;
     }
     
@@ -36,6 +39,7 @@ public class AssessmentRequestDTO {
         private String text;
         private Integer displayOrder;
     }
+
     
     @Data
     public static class MatchingPairDTO {

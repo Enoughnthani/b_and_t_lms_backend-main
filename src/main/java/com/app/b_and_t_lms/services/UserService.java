@@ -233,7 +233,7 @@ public class UserService {
             return new ApiResponse<>(true, "User deleted successfully", null);
 
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to delete user: " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to delete user: " , null);
         }
     }
 
@@ -365,7 +365,7 @@ public class UserService {
 
                 } catch (Exception e) {
 
-                    result.getErrors().add("Line " + lineNumber + ": Unexpected error" + e.getMessage());
+                    result.getErrors().add("Line " + lineNumber + ": Unexpected error" );
                     result.setErrorCount(result.getErrorCount() + 1);
                 }
             }
@@ -503,7 +503,7 @@ public class UserService {
             } catch (DataIntegrityViolationException e) {
                 result.addError(userId, "Cannot delete user due to existing references (e.g., loans, transactions)");
             } catch (Exception e) {
-                result.addError(userId, "Failed to delete user: " + e.getMessage());
+                result.addError(userId, "Failed to delete user: " );
             }
         }
 
@@ -690,7 +690,7 @@ public class UserService {
 
             return new ApiResponse<>(true, "Staffs", staffUsers.stream().map(StaffDTO::new).toList());
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to get staff " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to get staff " , null);
         }
     }
 

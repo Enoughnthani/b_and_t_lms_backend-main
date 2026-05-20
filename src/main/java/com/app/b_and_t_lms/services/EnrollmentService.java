@@ -64,7 +64,7 @@ public class EnrollmentService {
             }
             return new ApiResponse<>(false, "Enrollment failed due to data integrity issue", null);
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Enrollment failed: " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Enrollment failed: " , null);
         }
     }
 
@@ -94,7 +94,7 @@ public class EnrollmentService {
             return new ApiResponse<>(true, user.getFirstname() + " removed.", new ProgramDTO(program));
 
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to remove user from program " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to remove user from program " , null);
         }
     }
 

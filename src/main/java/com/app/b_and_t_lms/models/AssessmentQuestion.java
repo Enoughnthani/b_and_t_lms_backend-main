@@ -46,6 +46,9 @@ public class AssessmentQuestion {
     private List<QuestionOption> options = new ArrayList<>();
 
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<AssessmentBlank> blanks = new ArrayList<>();
+
+    @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MatchingPair> matchingPairs = new ArrayList<>();
 
     private LocalDateTime createdAt;

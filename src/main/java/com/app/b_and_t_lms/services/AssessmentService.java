@@ -8,9 +8,12 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -29,7 +32,10 @@ import com.app.b_and_t_lms.dto.AssessmentRequestDTO.OptionDTO;
 import com.app.b_and_t_lms.dto.AssessmentRequestDTO.QuestionDTO;
 import com.app.b_and_t_lms.dto.AssessmentResponseDTO;
 import com.app.b_and_t_lms.dto.AssessmentSubmissionDTO;
+import com.app.b_and_t_lms.dto.LearnerAssessmentResponseDTO;
+import com.app.b_and_t_lms.dto.TestSubmissionDTO;
 import com.app.b_and_t_lms.models.Assessment;
+import com.app.b_and_t_lms.models.AssessmentBlank;
 import com.app.b_and_t_lms.models.AssessmentQuestion;
 import com.app.b_and_t_lms.models.AssessmentSubmission;
 import com.app.b_and_t_lms.models.MatchingPair;
@@ -80,7 +86,51 @@ public class AssessmentService {
 
             return new ApiResponse<>(true, "Assessments retrieved successfully ", dtos);
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to retrieve assessments: " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to retrieve assessments: ", null);
+        }
+    }
+
+    public ApiResponse<?> getAssessmentsByUnitStandardForLearner(
+            Long unitStandardId,
+            Authentication authentication) {
+        try {
+            User user = (User) authentication.getPrincipal();
+
+            List<Assessment> assessments = assessmentRepository
+                    .findByUnitStandardUnitStandardId(unitStandardId);
+
+            List<LearnerAssessmentResponseDTO> dtos = assessments.stream()
+                    .map(assessment -> {
+                        LearnerAssessmentResponseDTO dto = new LearnerAssessmentResponseDTO(assessment);
+
+                        AssessmentSubmission submission = assessment.getSubmissions().stream()
+                                .filter(s -> s.getUser().equals(user))
+                                .findFirst()
+                                .orElse(null);
+
+                        if (submission != null) {
+                            dto.setSubmission(new AssessmentSubmissionDTO(submission));
+                        }
+
+                        return dto;
+                    })
+                    .toList();
+
+            return new ApiResponse<>(true, "Assessments retrieved successfully", dtos);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to retrieve assessments: ", null);
+        }
+    }
+
+    public ApiResponse<?> getAssessmentByIdForLearner(Long id) {
+        try {
+            Assessment assessment = assessmentRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Assessment not found"));
+
+            return new ApiResponse<>(true, "Assessment retrieved successfully",
+                    new LearnerAssessmentResponseDTO(assessment));
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to retrieve assessment: ", null);
         }
     }
 
@@ -90,7 +140,7 @@ public class AssessmentService {
                     .orElseThrow(() -> new RuntimeException("Assessment not found"));
             return new ApiResponse<>(true, "Assessment retrieved successfully", new AssessmentResponseDTO(assessment));
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to retrieve assessment: " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to retrieve assessment: ", null);
         }
     }
 
@@ -107,7 +157,7 @@ public class AssessmentService {
             assessmentRepository.delete(assessment);
             return new ApiResponse<>(true, "Assessment deleted successfully", null);
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to delete assessment: " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to delete assessment: ", null);
         }
     }
 
@@ -117,7 +167,7 @@ public class AssessmentService {
                     .map(AssessmentSubmissionDTO::new).toList();
             return new ApiResponse<>(true, "Submissions retrieved successfully", submissions);
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to retrieve submissions: " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to retrieve submissions: ", null);
         }
     }
 
@@ -234,7 +284,7 @@ public class AssessmentService {
                 return new ApiResponse<>(true, "No submission found", null);
             }
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to get submission: " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to get submission: ", null);
         }
     }
 
@@ -305,6 +355,17 @@ public class AssessmentService {
                         }
                     }
 
+                    if (qDto.getBlanks() != null && !qDto.getBlanks().isEmpty()) {
+                        int position = 0;
+                        for (String blank : qDto.getBlanks()) {
+                            AssessmentBlank AssessmentBlank = new AssessmentBlank();
+                            AssessmentBlank.setBlank(blank);
+                            AssessmentBlank.setPosition(position++);
+                            AssessmentBlank.setQuestion(question);
+                            question.getBlanks().add(AssessmentBlank);
+                        }
+                    }
+
                     if (qDto.getMatchingPairs() != null && !qDto.getMatchingPairs().isEmpty()) {
                         int pairOrder = 0;
                         for (MatchingPairDTO mDto : qDto.getMatchingPairs()) {
@@ -331,7 +392,7 @@ public class AssessmentService {
             return new ApiResponse<>(true, message, new AssessmentResponseDTO(savedAssessment));
 
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to create assessment: " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to create assessment: ", null);
         }
     }
 
@@ -341,6 +402,7 @@ public class AssessmentService {
             Assessment assessment = assessmentRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Assessment not found"));
 
+            // Update basic info
             assessment.setTitle(dto.getTitle());
             assessment.setDescription(dto.getDescription());
 
@@ -380,7 +442,6 @@ public class AssessmentService {
                 assessment.getQuestions().clear();
 
                 int order = 0;
-
                 for (AssessmentRequestDTO.QuestionDTO qDto : questionList) {
                     AssessmentQuestion question = new AssessmentQuestion();
                     question.setType(AssessmentQuestion.QuestionType.valueOf(qDto.getType()));
@@ -392,12 +453,9 @@ public class AssessmentService {
                     question.setDisplayOrder(order++);
                     question.setAssessment(assessment);
 
-                    if (question.getOptions() == null) {
-                        question.setOptions(new ArrayList<>());
-                    }
-                    if (question.getMatchingPairs() == null) {
-                        question.setMatchingPairs(new ArrayList<>());
-                    }
+                    question.getOptions().clear();
+                    question.getBlanks().clear();
+                    question.getMatchingPairs().clear();
 
                     if (qDto.getOptions() != null && !qDto.getOptions().isEmpty()) {
                         int optOrder = 0;
@@ -407,6 +465,29 @@ public class AssessmentService {
                             option.setDisplayOrder(optOrder++);
                             option.setQuestion(question);
                             question.getOptions().add(option);
+                        }
+                    }
+
+                    if (qDto.getBlanks() != null && !qDto.getBlanks().isEmpty()) {
+                        int position = 0;
+                        for (String blank : qDto.getBlanks()) {
+                            AssessmentBlank assessmentBlank = new AssessmentBlank();
+                            assessmentBlank.setBlank(blank);
+                            assessmentBlank.setPosition(position++);
+                            assessmentBlank.setQuestion(question);
+                            question.getBlanks().add(assessmentBlank);
+                        }
+                    } else if (qDto.getType().equalsIgnoreCase("FILL_IN_BLANKS") && qDto.getText() != null) {
+
+                        if (qDto.getBlanks() != null && !qDto.getBlanks().isEmpty()) {
+                            int position = 0;
+                            for (String blank : qDto.getBlanks()) {
+                                AssessmentBlank assessmentBlank = new AssessmentBlank();
+                                assessmentBlank.setBlank(blank);
+                                assessmentBlank.setPosition(position++);
+                                assessmentBlank.setQuestion(question);
+                                question.getBlanks().add(assessmentBlank);
+                            }
                         }
                     }
 
@@ -428,8 +509,17 @@ public class AssessmentService {
                 assessment.getQuestions().clear();
             }
 
+            if (assessment.getQuestions() != null && !assessment.getQuestions().isEmpty()) {
+                Integer calculatedTotal = assessment.getQuestions().stream()
+                        .mapToInt(AssessmentQuestion::getMarks)
+                        .sum();
+                if (!calculatedTotal.equals(assessment.getTotalMarks())) {
+                    assessment.setTotalMarks(calculatedTotal);
+                }
+            }
+
             Assessment saved = assessmentRepository.save(assessment);
-            return new ApiResponse<>(true, "Assessment updated successfully " + dto.getStartDate(),
+            return new ApiResponse<>(true, "Assessment updated successfully",
                     new AssessmentResponseDTO(saved));
 
         } catch (Exception e) {
@@ -470,8 +560,6 @@ public class AssessmentService {
                     null);
         }
 
-        
-
         if (dueDate != null && dueDate.isBefore(today)) {
 
             return new ApiResponse<>(
@@ -499,6 +587,157 @@ public class AssessmentService {
         assessment.setDueDate(dueDate);
 
         return null;
+    }
+
+    @Transactional
+    public ApiResponse<?> submitTest(TestSubmissionDTO submission, Authentication authentication) {
+        try {
+             
+            Assessment assessment = assessmentRepository.findById(submission.getAssessmentId())
+                    .orElseThrow(() -> new RuntimeException("Assessment not found"));
+
+            
+            if (assessment.getType() != Assessment.AssessmentType.TEST) {
+                return new ApiResponse<>(false, "This endpoint is only for test submissions", null);
+            }
+
+          
+            String email = authentication.getName();
+            User user = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new RuntimeException("User not found"));
+
+      
+            Optional<AssessmentSubmission> existingSubmission = submissionRepository.findByAssessmentAndUser(assessment,
+                    user);
+
+            if (existingSubmission.isPresent()
+                    && existingSubmission.get().getStatus() == AssessmentSubmission.SubmissionStatus.SUBMITTED) {
+                return new ApiResponse<>(false, "You have already submitted this test", null);
+            }
+
+         
+            int obtainedMarks = calculateMarks(assessment, submission.getAnswers());
+
+          
+            AssessmentSubmission assessmentSubmission = existingSubmission.orElse(new AssessmentSubmission());
+            assessmentSubmission.setAssessment(assessment);
+            assessmentSubmission.setUser(user);
+            assessmentSubmission.setObtainedMarks(obtainedMarks);
+            assessmentSubmission.setStatus(AssessmentSubmission.SubmissionStatus.SUBMITTED);
+            assessmentSubmission.setSubmittedAt(LocalDateTime.now());
+
+            ObjectMapper mapper = new ObjectMapper();
+            String answersJson = mapper.writeValueAsString(submission.getAnswers());
+            assessmentSubmission.setFeedback(answersJson); 
+
+            submissionRepository.save(assessmentSubmission);
+
+            return new ApiResponse<>(true,
+                    String.format("Test submitted successfully! Score: %d/%d", obtainedMarks,
+                            assessment.getTotalMarks()),
+                    Map.of("obtainedMarks", obtainedMarks, "totalMarks", assessment.getTotalMarks()));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ApiResponse<>(false, "Failed to submit test: " + e.getMessage(), null);
+        }
+    }
+
+    private int calculateMarks(Assessment assessment, List<TestSubmissionDTO.AnswerDTO> answers) {
+        int totalObtained = 0;
+
+        
+        Map<Long, TestSubmissionDTO.AnswerDTO> answerMap = answers.stream()
+                .collect(Collectors.toMap(
+                        TestSubmissionDTO.AnswerDTO::getQuestionId,
+                        a -> a,
+                        (existing, replacement) -> existing));
+
+        for (AssessmentQuestion question : assessment.getQuestions()) {
+            TestSubmissionDTO.AnswerDTO userAnswer = answerMap.get(question.getId());
+            if (userAnswer != null) {
+                totalObtained += evaluateQuestion(question, userAnswer);
+            }
+        }
+
+        return totalObtained;
+    }
+
+    private int evaluateQuestion(AssessmentQuestion question, TestSubmissionDTO.AnswerDTO userAnswer) {
+        switch (question.getType()) {
+            case TRUE_OR_FALSE:
+                if (userAnswer.getAnswer() != null &&
+                        userAnswer.getAnswer().equalsIgnoreCase(question.getCorrectAnswer())) {
+                    return question.getMarks();
+                }
+                return 0;
+
+            case MULTIPLE_CHOICE:
+                if (userAnswer.getAnswer() != null &&
+                        userAnswer.getAnswer().equalsIgnoreCase(question.getCorrectAnswer())) {
+                    return question.getMarks();
+                }
+                return 0;
+
+            case FILL_IN_BLANKS:
+                return evaluateFillInBlanks(question, userAnswer);
+
+            case LONG_QUESTION:
+                return 0;
+
+            case MATCHING:
+                return evaluateMatching(question, userAnswer);
+
+            default:
+                return 0;
+        }
+    }
+
+    private int evaluateFillInBlanks(AssessmentQuestion question, TestSubmissionDTO.AnswerDTO userAnswer) {
+        List<String> correctBlanks = question.getBlanks().stream()
+                .sorted(Comparator.comparing(AssessmentBlank::getPosition))
+                .map(AssessmentBlank::getBlank)
+                .collect(Collectors.toList());
+
+        List<String> userBlanks = userAnswer.getAnswerArray();
+
+        if (userBlanks == null || userBlanks.isEmpty()) {
+            return 0;
+        }
+
+        int marksPerBlank = question.getMarks() / correctBlanks.size();
+        int obtained = 0;
+
+        for (int i = 0; i < correctBlanks.size() && i < userBlanks.size(); i++) {
+            if (correctBlanks.get(i).equalsIgnoreCase(userBlanks.get(i).trim())) {
+                obtained += marksPerBlank;
+            }
+        }
+
+        return obtained;
+    }
+
+    private int evaluateMatching(AssessmentQuestion question, TestSubmissionDTO.AnswerDTO userAnswer) {
+        Map<String, String> userMatches = userAnswer.getMatchingAnswers();
+        if (userMatches == null || userMatches.isEmpty()) {
+            return 0;
+        }
+
+        List<MatchingPair> correctPairs = question.getMatchingPairs().stream()
+                .sorted(Comparator.comparing(MatchingPair::getDisplayOrder))
+                .collect(Collectors.toList());
+
+        int marksPerPair = question.getMarks() / correctPairs.size();
+        int correctMatches = 0;
+
+        for (MatchingPair pair : correctPairs) {
+            String userRightItem = userMatches.get(pair.getLeftItem());
+            if (userRightItem != null && userRightItem.equals(pair.getRightItem())) {
+                correctMatches++;
+            }
+        }
+
+        return correctMatches * marksPerPair;
     }
 
 }

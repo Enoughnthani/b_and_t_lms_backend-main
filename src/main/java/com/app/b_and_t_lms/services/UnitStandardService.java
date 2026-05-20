@@ -119,7 +119,7 @@ public class UnitStandardService {
             return new ApiResponse<>(true, "Unit Standard updated successfully", new UnitStandardResponseDTO(updated));
 
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to update unit standard: " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to update unit standard: " , null);
         }
     }
 
