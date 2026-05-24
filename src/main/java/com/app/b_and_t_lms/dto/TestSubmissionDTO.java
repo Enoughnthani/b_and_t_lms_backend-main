@@ -13,7 +13,7 @@ public class TestSubmissionDTO {
     public static class AnswerDTO {
         private Long questionId;
         private String answer;              
-        private List<String> answerArray;   
+        private List<String> answers;   
         private Map<String, String> matchingAnswers; 
     }
 }
