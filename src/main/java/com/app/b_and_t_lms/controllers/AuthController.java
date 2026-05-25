@@ -43,7 +43,7 @@ public class AuthController {
                     response);
             return ResponseEntity.ok(userData);
         } catch (Exception e) {
-            return ResponseEntity.ok(new ApiResponse<>(false, "Failed to login "+e.getMessage(), null));
+            return ResponseEntity.ok(new ApiResponse<>(false, "Failed to login ", null));
         }
     }
 

@@ -188,7 +188,7 @@ public class UserController {
         try {
             return userService.deactivateUser(userId);
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to deactivate user " + e.getMessage(), null);
+            return new ApiResponse<>(false, "Failed to deactivate user ", null);
         }
     }
 

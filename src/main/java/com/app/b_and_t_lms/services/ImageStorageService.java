@@ -29,7 +29,7 @@ public class ImageStorageService {
             return "/uploads/" + folder + "/" + fileName;
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to save image: " + e.getMessage());
+            throw new RuntimeException("Failed to save image: " );
         }
     }
 
@@ -48,7 +48,7 @@ public class ImageStorageService {
             }
 
         } catch (Exception e) {
-            throw new RuntimeException("Failed to delete image: " + e.getMessage());
+            throw new RuntimeException("Failed to delete image: " );
         }
     }
 }

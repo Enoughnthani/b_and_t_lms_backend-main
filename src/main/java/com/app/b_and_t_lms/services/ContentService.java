@@ -128,7 +128,7 @@ public class ContentService {
         try {
             Files.copy(file.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
         } catch (IOException e) {
-            throw new RuntimeException("Failed to save file: " + e.getMessage());
+            throw new RuntimeException("Failed to save file: " );
         }
 
         // Get file size in readable format
@@ -225,7 +225,7 @@ public class ContentService {
                     Files.deleteIfExists(filePath);
                     System.out.println("Deleted file: " + filePath.toString());
                 } catch (IOException e) {
-                    System.err.println("Failed to delete file: " + e.getMessage());
+                    System.err.println("Failed to delete file: " );
                 }
             }
         }
@@ -252,7 +252,7 @@ public class ContentService {
                     System.out.println("File not found: " + filePath.toString());
                 }
             } catch (IOException e) {
-                System.err.println("Failed to delete file: " + e.getMessage());
+                System.err.println("Failed to delete file: " );
             }
         }
 

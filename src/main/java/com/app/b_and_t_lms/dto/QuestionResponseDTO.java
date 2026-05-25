@@ -19,6 +19,8 @@ public class QuestionResponseDTO {
     private String sampleAnswer;
     private Integer displayOrder;
     private List<String> options;
+    private List<String> blanks;
+    private Integer blanksCount;
     private List<MatchingPairResponseDTO> pairs;
 
     public QuestionResponseDTO(AssessmentQuestion question) {
@@ -30,26 +32,24 @@ public class QuestionResponseDTO {
         this.correctAnswer = question.getCorrectAnswer();
         this.sampleAnswer = question.getSampleAnswer();
         this.displayOrder = question.getDisplayOrder();
-        this.options = question.getOptions().stream().map(q->q.getText()).toList();
-        
-        
+        this.options = question.getOptions().stream().map(q -> q.getText()).toList();
+        this.blanks = question.getBlanks().stream().map(b -> b.getBlank()).toList();
+        this.blanksCount = blanks != null ? blanks.size() : 0;
+
         if (question.getMatchingPairs() != null) {
             this.pairs = question.getMatchingPairs().stream()
                     .map(MatchingPairResponseDTO::new)
                     .collect(Collectors.toList());
         }
     }
-}
 
-
-
-@Data
+    @Data
 class MatchingPairResponseDTO {
     private Long id;
     private String left;
     private String right;
     private Integer displayOrder;
-    
+
     public MatchingPairResponseDTO(MatchingPair pair) {
         this.id = pair.getId();
         this.left = pair.getLeftItem();
@@ -57,3 +57,5 @@ class MatchingPairResponseDTO {
         this.displayOrder = pair.getDisplayOrder();
     }
 }
+}
+
