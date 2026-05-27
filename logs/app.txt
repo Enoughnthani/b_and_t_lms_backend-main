@@ -189,3 +189,206 @@ org.springframework.transaction.UnexpectedRollbackException: Transaction silentl
 2026-05-27T19:06:56.308+02:00  INFO 16736 --- [b_and_t_lms] [Thread-49] com.zaxxer.hikari.HikariDataSource       : HikariPool-13 - Shutdown completed.
 2026-05-27T19:06:56.437+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] c.app.b_and_t_lms.BAndTLmsApplication    : Starting BAndTLmsApplication using Java 17.0.12 with PID 16736 (C:\Users\Enough\Documents\b_and_t_lms_backend-main\target\classes started by Enough in C:\Users\Enough\Documents\b_and_t_lms_backend-main)
 2026-05-27T19:06:56.438+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] c.app.b_and_t_lms.BAndTLmsApplication    : No active profile set, falling back to 1 default profile: "default"
+2026-05-27T19:06:56.661+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-27T19:06:56.700+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 38 ms. Found 10 JPA repository interfaces.
+2026-05-27T19:06:56.809+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-05-27T19:06:56.810+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-05-27T19:06:56.810+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2026-05-27T19:06:56.850+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] o.a.c.c.C.[Tomcat-2].[localhost].[/]     : Initializing Spring embedded WebApplicationContext
+2026-05-27T19:06:56.850+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 411 ms
+2026-05-27T19:06:56.896+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-27T19:06:56.900+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-27T19:06:56.910+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-27T19:06:56.911+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-14 - Starting...
+2026-05-27T19:06:56.915+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-14 - Added connection com.mysql.cj.jdbc.ConnectionImpl@25cd1be1
+2026-05-27T19:06:56.915+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-14 - Start completed.
+2026-05-27T19:06:56.916+02:00  WARN 16736 --- [b_and_t_lms] [restartedMain] org.hibernate.dialect.Dialect            : HHH000511: The 5.5.5 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2026-05-27T19:06:57.250+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-27T19:06:57.446+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-27T19:06:57.602+02:00  WARN 16736 --- [b_and_t_lms] [restartedMain] ion$DefaultTemplateResolverConfiguration : Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+2026-05-27T19:06:57.625+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-05-27T19:06:57.713+02:00  WARN 16736 --- [b_and_t_lms] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-05-27T19:06:57.743+02:00 DEBUG 16736 --- [b_and_t_lms] [restartedMain] s.w.s.m.m.a.RequestMappingHandlerMapping : 84 mappings in 'requestMappingHandlerMapping'
+2026-05-27T19:06:57.777+02:00 DEBUG 16736 --- [b_and_t_lms] [restartedMain] o.s.w.s.handler.SimpleUrlHandlerMapping  : Patterns [/webjars/**, /**, /uploads/**] in 'resourceHandlerMapping'
+2026-05-27T19:06:57.814+02:00 DEBUG 16736 --- [b_and_t_lms] [restartedMain] s.w.s.m.m.a.RequestMappingHandlerAdapter : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2026-05-27T19:06:57.819+02:00 DEBUG 16736 --- [b_and_t_lms] [restartedMain] .m.m.a.ExceptionHandlerExceptionResolver : ControllerAdvice beans: 1 @ExceptionHandler, 1 ResponseBodyAdvice
+2026-05-27T19:06:57.849+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2026-05-27T19:06:57.859+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-05-27T19:06:57.862+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] c.app.b_and_t_lms.BAndTLmsApplication    : Started BAndTLmsApplication in 1.455 seconds (process running for 1490.479)
+2026-05-27T19:06:57.884+02:00  INFO 16736 --- [b_and_t_lms] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-05-27T19:07:30.720+02:00  INFO 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.a.c.c.C.[Tomcat-2].[localhost].[/]     : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-05-27T19:07:30.721+02:00  INFO 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-05-27T19:07:30.721+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Detected StandardServletMultipartResolver
+2026-05-27T19:07:30.721+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Detected AcceptHeaderLocaleResolver
+2026-05-27T19:07:30.721+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Detected FixedThemeResolver
+2026-05-27T19:07:30.722+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Detected org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator@3c7e4a22
+2026-05-27T19:07:30.722+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Detected org.springframework.web.servlet.support.SessionFlashMapManager@113137b9
+2026-05-27T19:07:30.723+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : enableLoggingRequestDetails='false': request parameters and headers will be masked to prevent unsafe logging of potentially sensitive data
+2026-05-27T19:07:30.723+02:00  INFO 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2026-05-27T19:07:30.754+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : POST "/api/assessments/2/submit-test", parameters={}
+2026-05-27T19:07:30.754+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#submitTest(Long, TestSubmissionDTO, Authentication)
+2026-05-27T19:07:30.754+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [TestSubmissionDTO(assessmentId=2, answers=[TestSubmissionDTO.AnswerDTO(questionId=11, answer=true, a (truncated)...]
+2026-05-27T19:07:30.808+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:07:30.808+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Test submitted successfully, payload=null)]
+2026-05-27T19:07:30.809+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:07:30.857+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/2/submission", parameters={}
+2026-05-27T19:07:30.857+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getMySubmission(Long, Authentication)
+2026-05-27T19:07:30.873+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:07:30.873+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Test submission details retrieved successfully, payload={totalMark (truncated)...]
+2026-05-27T19:07:30.884+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:07:30.893+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/2/submission", parameters={}
+2026-05-27T19:07:30.895+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getMySubmission(Long, Authentication)
+2026-05-27T19:07:30.909+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:07:30.911+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Test submission details retrieved successfully, payload={totalMark (truncated)...]
+2026-05-27T19:07:30.912+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:09:48.019+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/2/submissions", parameters={}
+2026-05-27T19:09:48.020+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getSubmissions(Long)
+2026-05-27T19:09:48.020+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/2", parameters={}
+2026-05-27T19:09:48.021+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-4] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getAssessmentById(Long)
+2026-05-27T19:09:48.021+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : GET "/api/auth", parameters={}
+2026-05-27T19:09:48.022+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AuthController#checkPage(Authentication)
+2026-05-27T19:09:48.023+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:09:48.024+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=authenticated, payload=true)]
+2026-05-27T19:09:48.026+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:09:48.044+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:09:48.047+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Test submissions retrieved successfully, payload=[{userName=Mike M (truncated)...]
+2026-05-27T19:09:48.048+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:09:48.061+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-4] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:09:48.064+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-7] o.s.web.servlet.DispatcherServlet        : GET "/api/auth/me", parameters={}
+2026-05-27T19:09:48.064+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-7] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AuthController#me(Authentication)
+2026-05-27T19:09:48.064+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-4] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Assessment retrieved successfully, payload=AssessmentResponseDTO(i (truncated)...]
+2026-05-27T19:09:48.074+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:09:48.112+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-7] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:09:48.113+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-7] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=me, payload=UserData(firstname=Ntuthuko, lastname=Zulu, email=ntut (truncated)...]
+2026-05-27T19:09:48.120+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-7] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:10:17.857+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-10] o.s.web.servlet.DispatcherServlet        : POST "/api/assessments/submissions/7/grade", parameters={}
+2026-05-27T19:10:17.857+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-10] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#gradeSubmission(Long, Map, Authentication)
+2026-05-27T19:10:17.858+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-10] m.m.a.RequestResponseBodyMethodProcessor : Read "application/json;charset=UTF-8" to [{obtainedMarks=83, questionMarks={15=70}}]
+2026-05-27T19:10:17.872+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-10] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:10:17.872+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-10] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Submission graded successfully, payload=null)]
+2026-05-27T19:10:17.873+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-10] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:10:17.893+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/2/submissions", parameters={}
+2026-05-27T19:10:17.893+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getSubmissions(Long)
+2026-05-27T19:10:17.903+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:10:17.904+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Test submissions retrieved successfully, payload=[{userName=Mike M (truncated)...]
+2026-05-27T19:10:17.905+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:10:29.457+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/unit-standard/115378", parameters={}
+2026-05-27T19:10:29.457+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getAssessmentsByUnitStandard(Long, Authentication)
+2026-05-27T19:10:29.472+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:10:29.472+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Assessments retrieved successfully , payload=[AssessmentResponseDT (truncated)...]
+2026-05-27T19:10:29.472+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:10:29.488+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/unit-standard/115378", parameters={}
+2026-05-27T19:10:29.489+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getAssessmentsByUnitStandard(Long, Authentication)
+2026-05-27T19:10:29.490+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:10:29.490+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Assessments retrieved successfully , payload=[AssessmentResponseDT (truncated)...]
+2026-05-27T19:10:29.490+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:10:32.666+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/2/submission", parameters={}
+2026-05-27T19:10:32.666+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-3] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getMySubmission(Long, Authentication)
+2026-05-27T19:10:32.670+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-3] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:10:32.683+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-3] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Test submission details retrieved successfully, payload={totalMark (truncated)...]
+2026-05-27T19:10:32.683+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:10:32.683+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/2/submission", parameters={}
+2026-05-27T19:10:32.683+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getMySubmission(Long, Authentication)
+2026-05-27T19:10:32.707+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:10:32.710+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Test submission details retrieved successfully, payload={totalMark (truncated)...]
+2026-05-27T19:10:32.711+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:17.710+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/unit-standard/115378", parameters={}
+2026-05-27T19:11:17.710+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getAssessmentsByUnitStandard(Long, Authentication)
+2026-05-27T19:11:17.730+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:17.730+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Assessments retrieved successfully , payload=[AssessmentResponseDT (truncated)...]
+2026-05-27T19:11:17.733+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:17.740+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/unit-standard/115378", parameters={}
+2026-05-27T19:11:17.740+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getAssessmentsByUnitStandard(Long, Authentication)
+2026-05-27T19:11:17.760+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:17.760+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Assessments retrieved successfully , payload=[AssessmentResponseDT (truncated)...]
+2026-05-27T19:11:17.760+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:17.777+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/unit-standard/115378", parameters={}
+2026-05-27T19:11:17.778+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-4] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getAssessmentsByUnitStandard(Long, Authentication)
+2026-05-27T19:11:17.782+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : GET "/api/enrollments/count/1", parameters={}
+2026-05-27T19:11:17.782+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.EnrollmentController#count(Long)
+2026-05-27T19:11:17.786+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:17.786+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] m.m.a.RequestResponseBodyMethodProcessor : Writing [ApiResponse(success=true, message=Total enrolled learners, payload=14)]
+2026-05-27T19:11:17.788+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:17.802+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-4] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:17.802+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-8] o.s.web.servlet.DispatcherServlet        : GET "/api/enrollments/count/1", parameters={}
+2026-05-27T19:11:17.802+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-4] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Assessments retrieved successfully , payload=[AssessmentResponseDT (truncated)...]
+2026-05-27T19:11:17.802+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-8] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.EnrollmentController#count(Long)
+2026-05-27T19:11:17.804+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-4] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:17.811+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-8] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:17.811+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-8] m.m.a.RequestResponseBodyMethodProcessor : Writing [ApiResponse(success=true, message=Total enrolled learners, payload=14)]
+2026-05-27T19:11:17.813+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-8] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:17.824+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-9] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/unit-standard/115378", parameters={}
+2026-05-27T19:11:17.824+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-9] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getAssessmentsByUnitStandard(Long, Authentication)
+2026-05-27T19:11:17.835+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-9] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:17.836+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-9] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Assessments retrieved successfully , payload=[AssessmentResponseDT (truncated)...]
+2026-05-27T19:11:17.837+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-9] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:19.215+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/2", parameters={}
+2026-05-27T19:11:19.216+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getAssessmentById(Long)
+2026-05-27T19:11:19.278+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:19.278+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Assessment retrieved successfully, payload=AssessmentResponseDTO(i (truncated)...]
+2026-05-27T19:11:19.279+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:19.290+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/2", parameters={}
+2026-05-27T19:11:19.293+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getAssessmentById(Long)
+2026-05-27T19:11:19.308+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:19.310+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Assessment retrieved successfully, payload=AssessmentResponseDTO(i (truncated)...]
+2026-05-27T19:11:19.310+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-2] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:36.868+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-9] o.s.web.servlet.DispatcherServlet        : PUT "/api/assessments/2", parameters={multipart}
+2026-05-27T19:11:36.885+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-9] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#updateAssessment(Long, AssessmentRequestDTO)
+2026-05-27T19:11:36.964+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-9] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:36.965+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-9] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Assessment updated successfully, payload=AssessmentResponseDTO(id= (truncated)...]
+2026-05-27T19:11:36.966+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-9] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:37.046+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/unit-standard/115378", parameters={}
+2026-05-27T19:11:37.047+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getAssessmentsByUnitStandard(Long, Authentication)
+2026-05-27T19:11:37.070+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:37.071+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Assessments retrieved successfully , payload=[AssessmentResponseDT (truncated)...]
+2026-05-27T19:11:37.072+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:37.074+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/unit-standard/115378", parameters={}
+2026-05-27T19:11:37.074+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getAssessmentsByUnitStandard(Long, Authentication)
+2026-05-27T19:11:37.116+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:37.116+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-8] o.s.web.servlet.DispatcherServlet        : GET "/api/enrollments/count/1", parameters={}
+2026-05-27T19:11:37.117+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Assessments retrieved successfully , payload=[AssessmentResponseDT (truncated)...]
+2026-05-27T19:11:37.117+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-8] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.EnrollmentController#count(Long)
+2026-05-27T19:11:37.117+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:37.125+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-8] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:37.125+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-8] m.m.a.RequestResponseBodyMethodProcessor : Writing [ApiResponse(success=true, message=Total enrolled learners, payload=14)]
+2026-05-27T19:11:37.126+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-8] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:37.142+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-9] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/unit-standard/115378", parameters={}
+2026-05-27T19:11:37.144+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-9] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getAssessmentsByUnitStandard(Long, Authentication)
+2026-05-27T19:11:37.144+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-7] o.s.web.servlet.DispatcherServlet        : GET "/api/enrollments/count/1", parameters={}
+2026-05-27T19:11:37.146+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-7] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.EnrollmentController#count(Long)
+2026-05-27T19:11:37.149+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-7] m.m.a.RequestResponseBodyMethodProcessor : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:37.149+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-7] m.m.a.RequestResponseBodyMethodProcessor : Writing [ApiResponse(success=true, message=Total enrolled learners, payload=14)]
+2026-05-27T19:11:37.150+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-7] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:37.164+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-9] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:37.164+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-9] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Assessments retrieved successfully , payload=[AssessmentResponseDT (truncated)...]
+2026-05-27T19:11:37.165+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-9] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:37.183+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/unit-standard/115378", parameters={}
+2026-05-27T19:11:37.184+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getAssessmentsByUnitStandard(Long, Authentication)
+2026-05-27T19:11:37.198+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:37.198+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Assessments retrieved successfully , payload=[AssessmentResponseDT (truncated)...]
+2026-05-27T19:11:37.199+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-1] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:43.983+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : GET "/api/auth", parameters={}
+2026-05-27T19:11:43.983+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/2/submission", parameters={}
+2026-05-27T19:11:43.994+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-3] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AuthController#checkPage(Authentication)
+2026-05-27T19:11:43.994+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getMySubmission(Long, Authentication)
+2026-05-27T19:11:43.995+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-3] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:43.995+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-3] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=authenticated, payload=true)]
+2026-05-27T19:11:43.998+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-3] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:44.000+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:44.000+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Test submission details retrieved successfully, payload={totalMark (truncated)...]
+2026-05-27T19:11:44.000+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-5] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:11:44.014+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : GET "/api/auth/me", parameters={}
+2026-05-27T19:11:44.014+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AuthController#me(Authentication)
+2026-05-27T19:11:44.034+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:11:44.035+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=me, payload=UserData(firstname=Mike, lastname=Mabunda, email=mike@ (truncated)...]
+2026-05-27T19:11:44.039+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-6] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:15:55.918+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-7] o.s.web.servlet.DispatcherServlet        : DELETE "/api/assessments/2", parameters={}
+2026-05-27T19:15:55.919+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-7] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#deleteAssessment(Long)
+2026-05-27T19:15:55.975+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-7] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:15:55.975+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-7] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Assessment deleted successfully, payload=null)]
+2026-05-27T19:15:55.976+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-7] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-05-27T19:15:55.989+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-8] o.s.web.servlet.DispatcherServlet        : GET "/api/assessments/unit-standard/115378", parameters={}
+2026-05-27T19:15:55.990+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-8] s.w.s.m.m.a.RequestMappingHandlerMapping : Mapped to com.app.b_and_t_lms.controllers.AssessmentController#getAssessmentsByUnitStandard(Long, Authentication)
+2026-05-27T19:15:55.993+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-8] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
+2026-05-27T19:15:55.994+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-8] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=Assessments retrieved successfully , payload=[])]
+2026-05-27T19:15:55.994+02:00 DEBUG 16736 --- [b_and_t_lms] [http-nio-8080-exec-8] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
