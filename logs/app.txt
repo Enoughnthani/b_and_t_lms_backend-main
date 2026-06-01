@@ -9,3 +9,43 @@
 2026-06-01T09:18:12.467+02:00 DEBUG 23240 --- [b_and_t_lms] [http-nio-8080-exec-9] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Using 'application/json', given [*/*] and supported [application/json, application/*+json]
 2026-06-01T09:18:12.515+02:00 DEBUG 23240 --- [b_and_t_lms] [http-nio-8080-exec-9] o.s.w.s.m.m.a.HttpEntityMethodProcessor  : Writing [ApiResponse(success=true, message=me, payload=UserData(firstname=Ntuthuko, lastname=Zulu, email=ntut (truncated)...]
 2026-06-01T09:18:12.560+02:00 DEBUG 23240 --- [b_and_t_lms] [http-nio-8080-exec-9] o.s.web.servlet.DispatcherServlet        : Completed 200 OK
+2026-06-01T09:22:00.336+02:00  INFO 23240 --- [b_and_t_lms] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 6 class path changes (0 additions, 0 deletions, 6 modifications)
+2026-06-01T09:22:07.432+02:00  INFO 23240 --- [b_and_t_lms] [Thread-5] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-06-01T09:22:07.841+02:00  INFO 23240 --- [b_and_t_lms] [Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-06-01T09:22:08.108+02:00  INFO 23240 --- [b_and_t_lms] [Thread-5] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
+2026-06-01T09:22:09.774+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] c.app.b_and_t_lms.BAndTLmsApplication    : Starting BAndTLmsApplication using Java 17.0.12 with PID 23240 (C:\Users\6\Documents\b_and_t_lms_backend-main\target\classes started by 6 in C:\Users\6\Documents\b_and_t_lms_backend-main)
+2026-06-01T09:22:09.775+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] c.app.b_and_t_lms.BAndTLmsApplication    : No active profile set, falling back to 1 default profile: "default"
+2026-06-01T09:22:13.997+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-06-01T09:22:14.392+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 392 ms. Found 10 JPA repository interfaces.
+2026-06-01T09:22:18.579+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2026-06-01T09:22:18.999+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-06-01T09:22:19.156+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.31]
+2026-06-01T09:22:19.889+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2026-06-01T09:22:19.890+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 10110 ms
+2026-06-01T09:22:20.986+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-06-01T09:22:21.068+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-06-01T09:22:21.203+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-06-01T09:22:21.208+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Starting...
+2026-06-01T09:22:21.234+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] com.zaxxer.hikari.pool.HikariPool        : HikariPool-2 - Added connection com.mysql.cj.jdbc.ConnectionImpl@23da2304
+2026-06-01T09:22:21.238+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Start completed.
+2026-06-01T09:22:21.251+02:00  WARN 23240 --- [b_and_t_lms] [restartedMain] org.hibernate.dialect.Dialect            : HHH000511: The 5.5.5 version for [org.hibernate.dialect.MySQLDialect] is no longer supported, hence certain features may not work properly. The minimum supported version is 8.0.0. Check the community dialects project for available legacy versions.
+2026-06-01T09:22:24.562+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-06-01T09:22:25.277+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-06-01T09:22:26.471+02:00  WARN 23240 --- [b_and_t_lms] [restartedMain] o.a.c.c.C.[Tomcat].[localhost].[/]       : Cannot deserialize session attribute [SPRING_SECURITY_CONTEXT] for session [52D15B15D1828261D3003285B48AB154]
+2026-06-01T09:22:34.651+02:00  WARN 23240 --- [b_and_t_lms] [restartedMain] ion$DefaultTemplateResolverConfiguration : Cannot find template location: classpath:/templates/ (please add some templates, check your Thymeleaf configuration, or set spring.thymeleaf.check-template-location=false)
+2026-06-01T09:22:34.784+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name customUserDetailsService
+2026-06-01T09:22:35.485+02:00  WARN 23240 --- [b_and_t_lms] [restartedMain] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-06-01T09:22:36.039+02:00 DEBUG 23240 --- [b_and_t_lms] [restartedMain] s.w.s.m.m.a.RequestMappingHandlerMapping : 83 mappings in 'requestMappingHandlerMapping'
+2026-06-01T09:22:36.217+02:00 DEBUG 23240 --- [b_and_t_lms] [restartedMain] o.s.w.s.handler.SimpleUrlHandlerMapping  : Patterns [/webjars/**, /**, /uploads/**] in 'resourceHandlerMapping'
+2026-06-01T09:22:36.423+02:00 DEBUG 23240 --- [b_and_t_lms] [restartedMain] s.w.s.m.m.a.RequestMappingHandlerAdapter : ControllerAdvice beans: 0 @ModelAttribute, 0 @InitBinder, 1 RequestBodyAdvice, 1 ResponseBodyAdvice
+2026-06-01T09:22:36.447+02:00 DEBUG 23240 --- [b_and_t_lms] [restartedMain] .m.m.a.ExceptionHandlerExceptionResolver : ControllerAdvice beans: 1 @ExceptionHandler, 1 ResponseBodyAdvice
+2026-06-01T09:22:37.177+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] o.s.b.d.a.OptionalLiveReloadServer       : LiveReload server is running on port 35729
+2026-06-01T09:22:37.358+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2026-06-01T09:22:37.480+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] c.app.b_and_t_lms.BAndTLmsApplication    : Started BAndTLmsApplication in 28.98 seconds (process running for 588832.262)
+2026-06-01T09:22:37.582+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] .ConditionEvaluationDeltaLoggingListener : Condition evaluation unchanged
+2026-06-01T09:22:38.910+02:00  INFO 23240 --- [b_and_t_lms] [File Watcher] rtingClassPathChangeChangedEventListener : Restarting due to 7 class path changes (0 additions, 0 deletions, 7 modifications)
+2026-06-01T09:22:40.025+02:00  INFO 23240 --- [b_and_t_lms] [Thread-7] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-06-01T09:22:40.029+02:00  INFO 23240 --- [b_and_t_lms] [Thread-7] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown initiated...
+2026-06-01T09:22:40.042+02:00  INFO 23240 --- [b_and_t_lms] [Thread-7] com.zaxxer.hikari.HikariDataSource       : HikariPool-2 - Shutdown completed.
+2026-06-01T09:22:40.278+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] c.app.b_and_t_lms.BAndTLmsApplication    : Starting BAndTLmsApplication using Java 17.0.12 with PID 23240 (C:\Users\6\Documents\b_and_t_lms_backend-main\target\classes started by 6 in C:\Users\6\Documents\b_and_t_lms_backend-main)
+2026-06-01T09:22:40.284+02:00  INFO 23240 --- [b_and_t_lms] [restartedMain] c.app.b_and_t_lms.BAndTLmsApplication    : No active profile set, falling back to 1 default profile: "default"
