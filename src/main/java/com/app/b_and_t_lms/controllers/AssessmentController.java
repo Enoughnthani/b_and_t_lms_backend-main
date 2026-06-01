@@ -1,6 +1,7 @@
 package com.app.b_and_t_lms.controllers;
 
 import java.io.IOException;
+import java.util.Map;
 
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -127,6 +128,16 @@ public class AssessmentController {
             @RequestBody TestSubmissionDTO submission,
             Authentication authentication) {
         ApiResponse<?> response = assessmentService.submitTest(submission, authentication);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/submissions/{submissionId}/grade")
+    @PreAuthorize("hasRole('FACILITATOR')")
+    public ResponseEntity<ApiResponse<?>> gradeSubmission(
+            @PathVariable Long submissionId,
+            @RequestBody Map<String, Object> gradeData,
+            Authentication authentication) {
+        ApiResponse<?> response = assessmentService.gradeSubmission(submissionId, gradeData, authentication);
         return ResponseEntity.ok(response);
     }
 }

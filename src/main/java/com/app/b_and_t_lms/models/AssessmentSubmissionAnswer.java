@@ -13,7 +13,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
-@Entity
+@Entity 
 @Data
 public class AssessmentSubmissionAnswer {
     @Id
@@ -25,7 +25,9 @@ public class AssessmentSubmissionAnswer {
 
     private Long questionId;
     
-    private String answer;             
+    private String answer;
+    
+    @Column(columnDefinition = "TEXT")
     private String userAnswerText;     
     
     @ElementCollection

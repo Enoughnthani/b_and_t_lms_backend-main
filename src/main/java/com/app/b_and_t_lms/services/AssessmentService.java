@@ -264,8 +264,7 @@ public class AssessmentService {
                 }
 
                 return new ApiResponse<>(true, "Test submissions retrieved successfully", detailedSubmissions);
-            }
-            else {
+            } else {
                 List<AssessmentSubmissionDTO> submissionDTOs = submissions.stream()
                         .map(AssessmentSubmissionDTO::new)
                         .toList();
@@ -1139,6 +1138,68 @@ public class AssessmentService {
         }
 
         return correctMatches * marksPerPair;
+    }
+
+    @Transactional
+    public ApiResponse<?> gradeSubmission(Long submissionId, Map<String, Object> gradeData,
+            Authentication authentication) {
+        try {
+            AssessmentSubmission submission = submissionRepository.findById(submissionId)
+                    .orElseThrow(() -> new RuntimeException("Submission not found"));
+
+            Integer obtainedMarks = null;
+            if (gradeData.get("obtainedMarks") instanceof Integer) {
+                obtainedMarks = (Integer) gradeData.get("obtainedMarks");
+            } else if (gradeData.get("obtainedMarks") instanceof Number) {
+                obtainedMarks = ((Number) gradeData.get("obtainedMarks")).intValue();
+            }
+
+          
+            Object questionMarksObj = gradeData.get("questionMarks");
+            Map<Long, Integer> questionMarks = new HashMap<>();
+
+            if (questionMarksObj instanceof Map) {
+                Map<?, ?> rawMap = (Map<?, ?>) questionMarksObj;
+                for (Map.Entry<?, ?> entry : rawMap.entrySet()) {
+                    try {
+                        Long questionId = Long.valueOf(entry.getKey().toString());
+                        Integer marks = null;
+                        if (entry.getValue() instanceof Integer) {
+                            marks = (Integer) entry.getValue();
+                        } else if (entry.getValue() instanceof Number) {
+                            marks = ((Number) entry.getValue()).intValue();
+                        }
+                        if (marks != null) {
+                            questionMarks.put(questionId, marks);
+                        }
+                    } catch (NumberFormatException e) {
+                    }
+                }
+            }
+
+            if (!questionMarks.isEmpty() && submission.getAssessmentSubmissionAnswer() != null) {
+                for (AssessmentSubmissionAnswer answer : submission.getAssessmentSubmissionAnswer()) {
+                    Integer newMarks = questionMarks.get(answer.getQuestionId());
+                    if (newMarks != null) {
+                        answer.setMarksObtained(newMarks);
+                    }
+                }
+            }
+
+            if (obtainedMarks != null) {
+                submission.setObtainedMarks(obtainedMarks);
+            }
+            submission.setStatus(AssessmentSubmission.SubmissionStatus.GRADED);
+            submission.setGradedAt(LocalDateTime.now());
+
+            submissionRepository.save(submission);
+
+            return new ApiResponse<>(true, "Submission graded successfully", null);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ApiResponse<>(false, "Failed to grade submission: " + e.getMessage(), null);
+        }
     }
 
 }

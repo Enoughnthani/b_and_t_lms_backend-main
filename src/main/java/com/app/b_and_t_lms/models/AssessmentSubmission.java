@@ -35,13 +35,13 @@ public class AssessmentSubmission {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "assessment_id")
-    private Assessment assessment;
+    private Assessment assessment; 
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    private User user;
+    private User user;  
 
     private String fileUrl;
 
