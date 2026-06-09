@@ -29,71 +29,72 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/assessments")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('FACILITATOR,ASSESSOR,')")
+@PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR', 'ASSESSOR', 'MODERATOR')")
 public class AssessmentController {
 
     private final AssessmentService assessmentService;
 
     @GetMapping("/unit-standard/{unitStandardId}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR','LEARNER')")
-    public ResponseEntity<ApiResponse<?>> getAssessmentsByUnitStandard(@PathVariable Long unitStandardId,
+    @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR', 'ASSESSOR', 'MODERATOR', 'LEARNER')")
+    public ResponseEntity<ApiResponse<?>> getAssessmentsByUnitStandard(
+            @PathVariable Long unitStandardId,
             Authentication authentication) {
-        ApiResponse<?> response = assessmentService.getAssessmentsByUnitStandard(unitStandardId, authentication);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                assessmentService.getAssessmentsByUnitStandard(unitStandardId, authentication));
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR', 'LEARNER')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR', 'ASSESSOR', 'MODERATOR', 'LEARNER')")
     public ResponseEntity<ApiResponse<?>> getAssessmentById(@PathVariable Long id) {
-        ApiResponse<?> response = assessmentService.getAssessmentById(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                assessmentService.getAssessmentById(id));
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR')")
-    public ResponseEntity<ApiResponse<?>> createAssessment(@ModelAttribute AssessmentRequestDTO dto)
-            throws IOException {
-        ApiResponse<?> response = assessmentService.createAssessment(dto);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<?>> createAssessment(
+            @ModelAttribute AssessmentRequestDTO dto) throws IOException {
+        return ResponseEntity.ok(
+                assessmentService.createAssessment(dto));
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR')")
-    public ResponseEntity<ApiResponse<?>> updateAssessment(@PathVariable Long id,
+    public ResponseEntity<ApiResponse<?>> updateAssessment(
+            @PathVariable Long id,
             @ModelAttribute AssessmentRequestDTO dto) throws IOException {
-
-        ApiResponse<?> response = assessmentService.updateAssessment(id, dto);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                assessmentService.updateAssessment(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR')")
     public ResponseEntity<ApiResponse<?>> deleteAssessment(@PathVariable Long id) {
-        ApiResponse<?> response = assessmentService.deleteAssessment(id);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                assessmentService.deleteAssessment(id));
     }
 
     @GetMapping("/{assessmentId}/submissions")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR')")
-    public ResponseEntity<ApiResponse<?>> getSubmissions(@PathVariable Long assessmentId) {
-        ApiResponse<?> response = assessmentService.getSubmissions(assessmentId);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<?>> getSubmissions(
+            @PathVariable Long assessmentId) {
+        return ResponseEntity.ok(
+                assessmentService.getSubmissions(assessmentId));
     }
 
     @GetMapping("/download/{filename}")
-    @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR', 'LEARNER')")
-    public ResponseEntity<?> downloadAssessmentFile(@PathVariable String filename) throws IOException {
+    @PreAuthorize("hasAnyRole('ADMIN', 'FACILITATOR', 'ASSESSOR', 'MODERATOR', 'LEARNER')")
+    public ResponseEntity<?> downloadAssessmentFile(
+            @PathVariable String filename) throws IOException {
         return assessmentService.downloadAssessmentFile(filename);
     }
 
+    // Learner-only endpoints
     @PostMapping(value = "/submit", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('LEARNER')")
     public ResponseEntity<ApiResponse<?>> submitAssessment(
             @RequestParam("file") MultipartFile file,
-            @RequestParam("assessmentId") Long assessmentId, Authentication authentication) throws IOException {
+            @RequestParam("assessmentId") Long assessmentId,
+            Authentication authentication) throws IOException {
 
-        ApiResponse<?> response = assessmentService.submitAssessment(file, assessmentId, authentication);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(
+                assessmentService.submitAssessment(file, assessmentId, authentication));
     }
 
     @GetMapping("/{assessmentId}/submission")
@@ -101,8 +102,9 @@ public class AssessmentController {
     public ResponseEntity<ApiResponse<?>> getMySubmission(
             @PathVariable Long assessmentId,
             Authentication authentication) {
-        ApiResponse<?> response = assessmentService.getUserSubmission(assessmentId, authentication);
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(
+                assessmentService.getUserSubmission(assessmentId, authentication));
     }
 
     @GetMapping("/learner/unit-standard/{unitStandardId}")
@@ -110,34 +112,42 @@ public class AssessmentController {
     public ResponseEntity<ApiResponse<?>> getAssessmentsForLearner(
             @PathVariable Long unitStandardId,
             Authentication authentication) {
-        ApiResponse<?> response = assessmentService
-                .getAssessmentsByUnitStandardForLearner(unitStandardId, authentication);
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(
+                assessmentService.getAssessmentsByUnitStandardForLearner(
+                        unitStandardId, authentication));
     }
 
     @GetMapping("/{id}/learner")
     @PreAuthorize("hasRole('LEARNER')")
-    public ResponseEntity<ApiResponse<?>> getAssessmentForLearner(@PathVariable Long id) {
-        ApiResponse<?> response = assessmentService.getAssessmentByIdForLearner(id);
-        return ResponseEntity.ok(response);
+    public ResponseEntity<ApiResponse<?>> getAssessmentForLearner(
+            @PathVariable Long id) {
+
+        return ResponseEntity.ok(
+                assessmentService.getAssessmentByIdForLearner(id));
     }
 
     @PostMapping("/{assessmentId}/submit-test")
     @PreAuthorize("hasRole('LEARNER')")
-    public ResponseEntity<ApiResponse<?>> submitTest(@PathVariable Long assessmentId,
+    public ResponseEntity<ApiResponse<?>> submitTest(
+            @PathVariable Long assessmentId,
             @RequestBody TestSubmissionDTO submission,
             Authentication authentication) {
-        ApiResponse<?> response = assessmentService.submitTest(submission, authentication);
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(
+                assessmentService.submitTest(submission, authentication));
     }
 
+    // Grading
     @PostMapping("/submissions/{submissionId}/grade")
-    @PreAuthorize("hasRole('FACILITATOR')")
+    @PreAuthorize("hasAnyRole('FACILITATOR', 'ASSESSOR', 'MODERATOR')")
     public ResponseEntity<ApiResponse<?>> gradeSubmission(
             @PathVariable Long submissionId,
             @RequestBody Map<String, Object> gradeData,
             Authentication authentication) {
-        ApiResponse<?> response = assessmentService.gradeSubmission(submissionId, gradeData, authentication);
-        return ResponseEntity.ok(response);
+
+        return ResponseEntity.ok(
+                assessmentService.gradeSubmission(
+                        submissionId, gradeData, authentication));
     }
 }

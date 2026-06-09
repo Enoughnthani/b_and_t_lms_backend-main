@@ -391,8 +391,7 @@ public class AssessmentService {
 
             AssessmentSubmission submission = submissionOpt.get();
 
-            // For TEST assessments, return detailed results with per-question answers and
-            // marks
+        
             if (assessment.getType() == Assessment.AssessmentType.TEST) {
                 Map<String, Object> detailedResult = new HashMap<>();
                 detailedResult.put("id", submission.getId());
@@ -404,16 +403,14 @@ public class AssessmentService {
                 detailedResult.put("submittedAt", submission.getSubmittedAt());
                 detailedResult.put("gradedAt", submission.getGradedAt());
 
-                // Calculate percentage
+             
                 double percentage = (submission.getObtainedMarks() * 100.0) / assessment.getTotalMarks();
                 detailedResult.put("percentageScore", Math.round(percentage * 100.0) / 100.0);
 
-                // Check if passed
-                boolean passed = assessment.getPassingMarks() != null &&
-                        submission.getObtainedMarks() >= assessment.getPassingMarks();
-                detailedResult.put("passed", passed);
+            
+            
+                detailedResult.put("passed", submission.getObtainedMarks() >= 50);
 
-                // Build detailed question results
                 List<Map<String, Object>> questionResults = new ArrayList<>();
                 int fullyCorrect = 0;
                 int partiallyCorrect = 0;
@@ -508,10 +505,9 @@ public class AssessmentService {
                 detailedResult.put("partiallyCorrectCount", partiallyCorrect);
                 detailedResult.put("incorrectCount", incorrect);
 
-                return new ApiResponse<>(true, "Test submission details retrieved successfully", detailedResult);
+                return new ApiResponse<>(true, "Quiz submission details retrieved successfully", detailedResult);
             }
-            // For other assessment types (LEARNER_WORKBOOK, SUMMATIVE), return regular
-            // submission DTO
+
             else {
                 return new ApiResponse<>(true, "Submission found", new AssessmentSubmissionDTO(submission));
             }
@@ -620,7 +616,7 @@ public class AssessmentService {
             Assessment savedAssessment = assessmentRepository.save(assessment);
 
             String message = assessment.getType() == Assessment.AssessmentType.TEST && assessment.getQuestions() != null
-                    ? "Test assessment saved successfully with " + assessment.getQuestions().size() + " questions"
+                    ? "Quiz assessment saved successfully with " + assessment.getQuestions().size() + " questions"
                     : "Assessment created successfully";
 
             return new ApiResponse<>(true, message, new AssessmentResponseDTO(savedAssessment));
@@ -924,7 +920,7 @@ public class AssessmentService {
             }
             result.put("questionResults", questionResults);
 
-            return new ApiResponse<>(true, "Test submitted successfully", null);
+            return new ApiResponse<>(true, "Quiz submitted successfully", null);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -1035,7 +1031,7 @@ public class AssessmentService {
             }
 
             result.setQuestionResults(questionResults);
-            return new ApiResponse<>(true, "Test result retrieved successfully", result);
+            return new ApiResponse<>(true, "Quiz result retrieved successfully", result);
 
         } catch (Exception e) {
             e.printStackTrace();

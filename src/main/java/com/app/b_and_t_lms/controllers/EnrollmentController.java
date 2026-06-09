@@ -39,7 +39,7 @@ public class EnrollmentController {
     }
 
     @GetMapping("/count/{programId}")
-    @PreAuthorize("hasRole('FACILITATOR')")
+    @PreAuthorize("hasAnyRole('FACILITATOR','ASSESSOR','MODERATOR')")
     public ApiResponse<?> count(@PathVariable Long programId) {
         return enrollmentService.countByProgramId(programId);
     }

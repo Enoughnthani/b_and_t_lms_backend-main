@@ -19,7 +19,7 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/api/programs")
 @Valid
-@PreAuthorize("hasAnyRole('ADMIN', 'PROGRAM_MANAGER')")
+@PreAuthorize("hasAnyRole('ADMIN','ASSESSOR', 'PROGRAM_MANAGER', 'FACILITATOR')")
 public class ProgramController {
 
     private final ProgramService programService;
@@ -39,7 +39,6 @@ public class ProgramController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasAnyRole('FACILITATOR','PROGRAM_MANAGER')")
     public ApiResponse<?> getProgramById(@PathVariable Long id) {
         return programService.getProgramById(id);
     }
@@ -62,13 +61,11 @@ public class ProgramController {
     }
 
     @GetMapping("/{programId}/enrollments")
-    @PreAuthorize("hasAnyRole('ADMIN', 'PROGRAM_MANAGER', 'FACILITATOR')")
     public ApiResponse<?> getEnrolledLearners(@PathVariable Long programId) {
         return programService.getEnrolledLearners(programId);
     }
 
     @GetMapping("/{programId}/stats")
-    @PreAuthorize("hasAnyRole('FACILITATOR')")
     public ApiResponse<?> facilitatorProgramStats(@PathVariable Long programId) {
         return programService.getFacilitatorProgramStats(programId);
     }
