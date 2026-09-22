@@ -1,0 +1,26 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "Current File",
+            "request": "launch",
+            "mainClass": "${file}"
+        },
+        {
+            "type": "java",
+            "name": "BAndTLmsApplication",
+            "request": "launch",
+            "mainClass": "com.app.b_and_t_lms.BAndTLmsApplication",
+            "projectName": "g_connect_consultants",
+            "envFile": "${workspaceFolder}/.env"
+        },
+        {
+            "type": "java",
+            "name": "GenerateSecretKey",
+            "request": "launch",
+            "mainClass": "com.app.b_and_t_lms.util.GenerateSecretKey",
+            "projectName": "g_connect_consultants"
+        }
+    ]
+}
