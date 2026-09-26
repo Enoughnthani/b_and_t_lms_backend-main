@@ -233,7 +233,7 @@ public class UserService {
             return new ApiResponse<>(true, "User deleted successfully", null);
 
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to delete user: " , null);
+            return new ApiResponse<>(false, "Failed to delete user: ", null);
         }
     }
 
@@ -365,7 +365,7 @@ public class UserService {
 
                 } catch (Exception e) {
 
-                    result.getErrors().add("Line " + lineNumber + ": Unexpected error" );
+                    result.getErrors().add("Line " + lineNumber + ": Unexpected error");
                     result.setErrorCount(result.getErrorCount() + 1);
                 }
             }
@@ -503,7 +503,7 @@ public class UserService {
             } catch (DataIntegrityViolationException e) {
                 result.addError(userId, "Cannot delete user due to existing references (e.g., loans, transactions)");
             } catch (Exception e) {
-                result.addError(userId, "Failed to delete user: " );
+                result.addError(userId, "Failed to delete user: ");
             }
         }
 
@@ -690,7 +690,7 @@ public class UserService {
 
             return new ApiResponse<>(true, "Staffs", staffUsers.stream().map(StaffDTO::new).toList());
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to get staff " , null);
+            return new ApiResponse<>(false, "Failed to get staff ", null);
         }
     }
 
@@ -775,4 +775,104 @@ public class UserService {
             return new ApiResponse<>(false, "Failed to get user", null);
         }
     }
+
+    public ApiResponse<?> getProfile(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        return new ApiResponse<>(true, "profile", new UserData(user));
+    }
+
+    @Transactional
+    public ApiResponse<?> updateProfile(UserDTO dto, Authentication authentication) {
+
+        try {
+            User user = (User) authentication.getPrincipal();
+
+            if (user == null) {
+                return new ApiResponse<>(false, "User not authenticated", null);
+            }
+
+            if (dto.getFirstname() != null && !dto.getFirstname().isBlank()) {
+                user.setFirstname(dto.getFirstname().trim());
+            }
+
+            if (dto.getLastname() != null && !dto.getLastname().isBlank()) {
+                user.setLastname(dto.getLastname().trim());
+            }
+
+            if (dto.getContactNumber() != null && !dto.getContactNumber().isBlank()) {
+
+                String contactNumber = dto.getContactNumber().trim();
+
+                if (!contactNumber.equals(user.getContactNumber())) {
+                    boolean exists = userRepository.existsByContactNumber(contactNumber);
+
+                    if (exists) {
+                        return new ApiResponse<>(
+                                false,
+                                "Contact number already exists",
+                                new UserData(user));
+                    }
+
+                    user.setContactNumber(contactNumber);
+                }
+            }
+
+            if (dto.getEmail() != null && !dto.getEmail().isBlank()) {
+
+                String email = dto.getEmail().trim();
+
+                if (!email.equalsIgnoreCase(user.getEmail())) {
+
+                    boolean exists = userRepository.existsByEmail(email);
+
+                    if (exists) {
+                        return new ApiResponse<>(
+                                false,
+                                "Email already exists",
+                                new UserData(user));
+                    }
+
+                    user.setEmail(email);
+                }
+            }
+
+            // Password is optional
+            if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+                user.setPassword(passwordEncoder.encode(dto.getPassword()));
+            }
+
+            User updatedUser = userRepository.save(user);
+            Activity activity = new Activity();
+            createActivity(
+                    activity,
+                    "Profile Updated.",
+                    ActionType.UPDATED,
+                    updatedUser,
+                    null);
+
+            activityRepository.save(activity);
+
+            return new ApiResponse<>(
+                    true,
+                    "Profile updated successfully",
+                    new UserData(updatedUser));
+
+        } catch (DataIntegrityViolationException e) {
+
+            String message = resolveDatabaseError(e);
+
+            return new ApiResponse<>(
+                    false,
+                    message,
+                    null);
+
+        } catch (Exception e) {
+
+            return new ApiResponse<>(
+                    false,
+                    "Failed to update profile",
+                    null);
+        }
+    }
+
 }

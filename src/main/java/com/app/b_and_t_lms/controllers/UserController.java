@@ -203,4 +203,24 @@ public class UserController {
 
     }
 
+    @GetMapping("profile")
+    @PreAuthorize("isAuthenticated()")
+    public ApiResponse<?> profile(Authentication authentication) {
+        try {
+            return userService.getProfile(authentication);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "You are not authenticated", e.getLocalizedMessage());
+        }
+    }
+
+    @PutMapping("profile")
+    @PreAuthorize("isAuthenticated()")
+    public ApiResponse<?> profile(@RequestBody UserDTO dto, Authentication authentication) {
+        try {
+            return userService.updateProfile(dto,authentication);
+        } catch (Exception e) {
+            return new ApiResponse<>(false, "Failed to update profile", e.getLocalizedMessage());
+        }
+    }
+
 }

@@ -13,6 +13,7 @@ import com.app.b_and_t_lms.dto.UnitStandardResponseDTO;
 import com.app.b_and_t_lms.dto.UnitStandardStatsDTO;
 import com.app.b_and_t_lms.models.Program;
 import com.app.b_and_t_lms.models.UnitStandard;
+import com.app.b_and_t_lms.models.UnitStandard.UnitStandardStatus;
 import com.app.b_and_t_lms.models.UnitStandard.UnitStandardType;
 import com.app.b_and_t_lms.repositories.ProgramRepository;
 import com.app.b_and_t_lms.repositories.UnitStandardRepository;
@@ -27,122 +28,169 @@ public class UnitStandardService {
     private final ProgramRepository programRepository;
 
     public List<UnitStandardResponseDTO> getByProgramId(Long programId) {
-        List<UnitStandard> unitStandards = unitStandardRepository.findByProgramId(programId);
-        return unitStandards.stream()
+        return unitStandardRepository.findByProgramId(programId)
+                .stream()
                 .map(UnitStandardResponseDTO::new)
                 .collect(Collectors.toList());
     }
 
     public UnitStandardResponseDTO getById(Long unitStandardId) {
         UnitStandard unitStandard = unitStandardRepository.findById(unitStandardId)
-                .orElseThrow(() -> new RuntimeException("Unit Standard not found with id: " + unitStandardId));
+                .orElseThrow(() -> new RuntimeException(
+                        "Unit Standard not found with id: " + unitStandardId));
         return new UnitStandardResponseDTO(unitStandard);
     }
 
     public List<UnitStandardResponseDTO> getByProgramIdAndType(Long programId, String type) {
-        List<UnitStandard> unitStandards = unitStandardRepository.findByProgramIdAndType(programId, type);
-        return unitStandards.stream()
+        return unitStandardRepository.findByProgramIdAndType(programId, type)
+                .stream()
                 .map(UnitStandardResponseDTO::new)
                 .collect(Collectors.toList());
     }
 
     public UnitStandardResponseDTO getByIdWithContent(Long unitStandardId) {
         UnitStandard unitStandard = unitStandardRepository.findByIdWithContents(unitStandardId)
-                .orElseThrow(() -> new RuntimeException("Unit Standard not found with id: " + unitStandardId));
+                .orElseThrow(() -> new RuntimeException(
+                        "Unit Standard not found with id: " + unitStandardId));
         return new UnitStandardResponseDTO(unitStandard);
     }
 
     @Transactional
     public ApiResponse<?> create(UnitStandardRequestDTO dto) {
         if (dto.getTitle() == null || dto.getTitle().trim().isEmpty()) {
-            throw new RuntimeException("Unit Standard title is required");
+            return new ApiResponse<>(false, "Title is required", null);
         }
         if (dto.getProgramId() == null) {
-            throw new RuntimeException("Program ID is required");
+            return new ApiResponse<>(false, "Program ID is required", null);
+        }
+        if (dto.getUnitStandardId() == null) {
+            return new ApiResponse<>(false, "Module code is required", null);
         }
 
         if (unitStandardRepository.existsById(dto.getUnitStandardId())) {
             return new ApiResponse<>(false,
-                    "Unit Standard already exists with SAQA ID: " + dto.getUnitStandardId(),
+                    "A module already exists with code: " + dto.getUnitStandardId(),
                     null);
         }
 
         Program program = programRepository.findById(dto.getProgramId())
-                .orElseThrow(() -> new RuntimeException("Program not found with id: " + dto.getProgramId()));
+                .orElseThrow(() -> new RuntimeException(
+                        "Program not found with id: " + dto.getProgramId()));
 
-        UnitStandard unitStandard = new UnitStandard();
-        unitStandard.setUnitStandardId(dto.getUnitStandardId());
-        unitStandard.setTitle(dto.getTitle());
-        unitStandard.setDescription(dto.getDescription());
-        unitStandard.setCredits(dto.getCredits());
-        unitStandard.setNqfLevel(dto.getNqfLevel());
-        unitStandard.setType(dto.getType());
-        unitStandard.setProgram(program);
-        unitStandard.setCreatedAt(LocalDateTime.now());
+        UnitStandard us = new UnitStandard();
+        us.setUnitStandardId(dto.getUnitStandardId());
+        us.setTitle(dto.getTitle());
+        us.setDescription(dto.getDescription());
+        us.setPurpose(dto.getPurpose());
+        us.setLearningAssumed(dto.getLearningAssumed());
+        us.setCredits(dto.getCredits());
+        us.setNotionalHours(dto.getNotionalHours());
+        us.setNqfLevel(dto.getNqfLevel());
+        us.setType(dto.getType() != null ? dto.getType() : UnitStandardType.KNOWLEDGE);
+        us.setStatus(dto.getStatus() != null ? dto.getStatus() : UnitStandardStatus.ACTIVE);
+        us.setModerationBody(dto.getModerationBody());
+        us.setRangeStatement(dto.getRangeStatement());
+        us.setSpecificOutcomes(dto.getSpecificOutcomes());
+        us.setAssessmentCriteria(dto.getAssessmentCriteria());
+        us.setCriticalCrossFieldOutcomes(dto.getCriticalCrossFieldOutcomes());
+        us.setProgram(program);
+        us.setCreatedAt(LocalDateTime.now());
+        us.setUpdatedAt(LocalDateTime.now());
 
-        unitStandardRepository.save(unitStandard);
+        unitStandardRepository.save(us);
+
         return new ApiResponse<>(true,
-                "Unit Standard with SAQA ID " + dto.getUnitStandardId() + " was created successfully.",
-                null);
+                "Module " + dto.getUnitStandardId() + " created successfully.",
+                new UnitStandardResponseDTO(us));
     }
 
     @Transactional
     public ApiResponse<?> update(Long unitStandardId, UnitStandardRequestDTO dto) {
         try {
-            UnitStandard unitStandard = unitStandardRepository.findById(unitStandardId).orElse(null);
+            UnitStandard us = unitStandardRepository.findById(unitStandardId).orElse(null);
 
-            if (unitStandard == null) {
-                return new ApiResponse<>(false, "Unit Standard not found with id: " + unitStandardId, null);
+            if (us == null) {
+                return new ApiResponse<>(false,
+                        "Module not found with id: " + unitStandardId, null);
             }
 
             if (dto.getTitle() != null && !dto.getTitle().trim().isEmpty()) {
-                unitStandard.setTitle(dto.getTitle());
+                us.setTitle(dto.getTitle());
             }
-
             if (dto.getDescription() != null) {
-                unitStandard.setDescription(dto.getDescription());
+                us.setDescription(dto.getDescription());
             }
-
+            if (dto.getPurpose() != null) {
+                us.setPurpose(dto.getPurpose());
+            }
+            if (dto.getLearningAssumed() != null) {
+                us.setLearningAssumed(dto.getLearningAssumed());
+            }
             if (dto.getCredits() != null) {
-                unitStandard.setCredits(dto.getCredits());
+                us.setCredits(dto.getCredits());
             }
-
+            if (dto.getNotionalHours() != null) {
+                us.setNotionalHours(dto.getNotionalHours());
+            }
             if (dto.getNqfLevel() != null) {
-                unitStandard.setNqfLevel(dto.getNqfLevel());
+                us.setNqfLevel(dto.getNqfLevel());
             }
-
             if (dto.getType() != null) {
-                unitStandard.setType(dto.getType());
+                us.setType(dto.getType());
+            }
+            if (dto.getStatus() != null) {
+                us.setStatus(dto.getStatus());
+            }
+            if (dto.getModerationBody() != null) {
+                us.setModerationBody(dto.getModerationBody());
+            }
+            if (dto.getRangeStatement() != null) {
+                us.setRangeStatement(dto.getRangeStatement());
+            }
+            if (dto.getSpecificOutcomes() != null) {
+                us.setSpecificOutcomes(dto.getSpecificOutcomes());
+            }
+            if (dto.getAssessmentCriteria() != null) {
+                us.setAssessmentCriteria(dto.getAssessmentCriteria());
+            }
+            if (dto.getCriticalCrossFieldOutcomes() != null) {
+                us.setCriticalCrossFieldOutcomes(dto.getCriticalCrossFieldOutcomes());
             }
 
-            UnitStandard updated = unitStandardRepository.save(unitStandard);
-            return new ApiResponse<>(true, "Unit Standard updated successfully", new UnitStandardResponseDTO(updated));
+            us.setUpdatedAt(LocalDateTime.now());
+
+            UnitStandard updated = unitStandardRepository.save(us);
+            return new ApiResponse<>(true, "Module updated successfully",
+                    new UnitStandardResponseDTO(updated));
 
         } catch (Exception e) {
-            return new ApiResponse<>(false, "Failed to update unit standard: " , null);
+            return new ApiResponse<>(false,
+                    "Failed to update module: " + e.getMessage(), null);
         }
     }
 
     @Transactional
     public ApiResponse<?> delete(Long unitStandardId) {
-        UnitStandard unitStandard = unitStandardRepository.findById(unitStandardId).orElse(null);
+        UnitStandard us = unitStandardRepository.findById(unitStandardId).orElse(null);
 
-        if (unitStandard == null) {
-            return new ApiResponse<>(false, "Unit Standard not found with id: " + unitStandardId, null);
-        }
-
-        if (unitStandard.getContents() != null && !unitStandard.getContents().isEmpty()) {
+        if (us == null) {
             return new ApiResponse<>(false,
-                    "Cannot delete Unit Standard with existing content. Delete all content first.", null);
+                    "Module not found with id: " + unitStandardId, null);
         }
 
-        unitStandardRepository.delete(unitStandard);
-        return new ApiResponse<>(true, "Unit Standard deleted.", null);
+        if (us.getContents() != null && !us.getContents().isEmpty()) {
+            return new ApiResponse<>(false,
+                    "Cannot delete module with existing content. Delete all content first.",
+                    null);
+        }
+
+        unitStandardRepository.delete(us);
+        return new ApiResponse<>(true, "Module deleted.", null);
     }
 
     public List<UnitStandardResponseDTO> search(Long programId, String keyword) {
-        List<UnitStandard> results = unitStandardRepository.searchByProgramIdAndKeyword(programId, keyword);
-        return results.stream()
+        return unitStandardRepository.searchByProgramIdAndKeyword(programId, keyword)
+                .stream()
                 .map(UnitStandardResponseDTO::new)
                 .collect(Collectors.toList());
     }
@@ -156,54 +204,68 @@ public class UnitStandardService {
         List<UnitStandard> unitStandards = unitStandardRepository.findByProgramId(programId);
 
         int total = unitStandards.size();
-        int fundamental = 0;
-        int core = 0;
-        int elective = 0;
+        int knowledge = 0;
+        int practical = 0;
+        int workExperience = 0;
+        int active = 0;
+        int phasedOut = 0;
         int totalCredits = 0;
-        int totalHours = 0;
+        int notionalHours = 0;
 
         for (UnitStandard us : unitStandards) {
             UnitStandardType type = us.getType();
+            if (type != null) {
+                switch (type) {
+                    case KNOWLEDGE:
+                        knowledge++;
+                        break;
+                    case PRACTICAL:
+                        practical++;
+                        break;
+                    case WORK_EXPERIENCE:
+                        workExperience++;
+                        break;
+                }
+            }
 
-            switch (type) {
-                case CORE:
-                    core++;
-                    break;
-                case FUNDAMENTAL:
-                    fundamental++;
-                    break;
-                default:
-                    elective++;
-                    break;
+            if (us.getStatus() == UnitStandardStatus.ACTIVE) {
+                active++;
+            }
+            if (us.getStatus() == UnitStandardStatus.PHASED_OUT) {
+                phasedOut++;
             }
 
             if (us.getCredits() != null) {
                 totalCredits += us.getCredits();
             }
+            if (us.getNotionalHours() != null) {
+                notionalHours += us.getNotionalHours();
+            }
         }
 
-        double averageCredits = total > 0 ? (double) totalCredits / total : 0;
-        double averageHours = total > 0 ? (double) totalHours / total : 0;
-
-        return new UnitStandardStatsDTO(
-                total, fundamental, core, elective, totalCredits,
-                0, 0, averageCredits, averageHours);
+        UnitStandardStatsDTO stats = new UnitStandardStatsDTO();
+        stats.setTotal(total);
+        stats.setKnowledge(knowledge);
+        stats.setPractical(practical);
+        stats.setWorkExperience(workExperience);
+        stats.setActive(active);
+        stats.setPhasedOut(phasedOut);
+        stats.setTotalCredits(totalCredits);
+        stats.setNotionalHours(notionalHours);
+        return stats;
     }
 
     public List<UnitStandardResponseDTO> getEmptyUnitStandards(Long programId) {
-        List<UnitStandard> emptyStandards = unitStandardRepository.findEmptyUnitStandardsByProgramId(programId);
-        return emptyStandards.stream()
+        return unitStandardRepository.findEmptyUnitStandardsByProgramId(programId)
+                .stream()
                 .map(UnitStandardResponseDTO::new)
                 .collect(Collectors.toList());
     }
 
     public List<UnitStandardResponseDTO> getUnitStandardsWithContent(Long programId) {
-        List<UnitStandard> standardsWithContent = unitStandardRepository
-                .findUnitStandardsWithContentsByProgramId(programId);
-        return standardsWithContent.stream()
+        return unitStandardRepository.findUnitStandardsWithContentsByProgramId(programId)
+                .stream()
                 .map(UnitStandardResponseDTO::new)
                 .collect(Collectors.toList());
     }
-
-    
 }

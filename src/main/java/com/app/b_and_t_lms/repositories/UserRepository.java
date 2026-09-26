@@ -22,4 +22,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Long countBySuperUserFalse();
 
+    boolean existsByContactNumber(String contactNumber);
+
 }

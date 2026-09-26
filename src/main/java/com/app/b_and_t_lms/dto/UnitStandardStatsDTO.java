@@ -8,15 +8,12 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class UnitStandardStatsDTO {
-    
-    private int total;
-    private int fundamental;
-    private int core;
-    private int elective;
-    private int totalCredits;
-    private int completed;
-    private int inProgress;
-    private double averageCredits;
-    private double averageHours;
-
+    private Integer total;
+    private Integer knowledge;
+    private Integer practical;
+    private Integer workExperience;
+    private Integer active;
+    private Integer phasedOut;
+    private Integer totalCredits;
+    private Integer notionalHours;
 }

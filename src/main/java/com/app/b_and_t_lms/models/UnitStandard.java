@@ -15,7 +15,15 @@ import java.util.List;
 public class UnitStandard {
 
     public enum UnitStandardType {
-        FUNDAMENTAL, CORE, ELECTIVE
+        KNOWLEDGE,
+        PRACTICAL,
+        WORK_EXPERIENCE
+    }
+
+    public enum UnitStandardStatus {
+        ACTIVE,
+        PHASED_OUT,
+        PENDING
     }
 
     @Id
@@ -27,14 +35,57 @@ public class UnitStandard {
     @Column(columnDefinition = "TEXT")
     private String description;
 
+    @Column(columnDefinition = "TEXT")
+    private String purpose;
+
+    @Column(name = "learning_assumed", columnDefinition = "TEXT")
+    private String learningAssumed;
+
     private Integer credits;
+
+    @Column(name = "notional_hours")
+    private Integer notionalHours;
 
     @Column(name = "nqf_level", length = 20)
     private String nqfLevel;
 
     @Enumerated(EnumType.STRING)
-    @Column(length = 20)
+    @Column(length = 30)
     private UnitStandardType type;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private UnitStandardStatus status = UnitStandardStatus.ACTIVE;
+
+    @Column(name = "moderation_body", length = 255)
+    private String moderationBody;
+
+    @Column(name = "range_statement", columnDefinition = "TEXT")
+    private String rangeStatement;
+
+    @ElementCollection
+    @CollectionTable(
+        name = "unit_standard_specific_outcomes",
+        joinColumns = @JoinColumn(name = "unit_standard_id")
+    )
+    @Column(name = "outcome", columnDefinition = "TEXT")
+    private List<String> specificOutcomes = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(
+        name = "unit_standard_assessment_criteria",
+        joinColumns = @JoinColumn(name = "unit_standard_id")
+    )
+    @Column(name = "criterion", columnDefinition = "TEXT")
+    private List<String> assessmentCriteria = new ArrayList<>();
+
+    @ElementCollection
+    @CollectionTable(
+        name = "unit_standard_cross_field_outcomes",
+        joinColumns = @JoinColumn(name = "unit_standard_id")
+    )
+    @Column(name = "outcome", columnDefinition = "TEXT")
+    private List<String> criticalCrossFieldOutcomes = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "program_id")
@@ -56,6 +107,9 @@ public class UnitStandard {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
+        if (status == null) {
+            status = UnitStandardStatus.ACTIVE;
+        }
     }
 
     @PreUpdate

@@ -1,11 +1,13 @@
 package com.app.b_and_t_lms.dto;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import java.util.List;
 
+import com.app.b_and_t_lms.models.UnitStandard.UnitStandardStatus;
 import com.app.b_and_t_lms.models.UnitStandard.UnitStandardType;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
@@ -14,12 +16,18 @@ public class UnitStandardRequestDTO {
     private Long unitStandardId;
     private String title;
     private String description;
+    private String purpose;
+    private String learningAssumed;
     private Integer credits;
+    private Integer notionalHours;
     private String nqfLevel;
     private UnitStandardType type;
-    private Integer notionalHours;
-    private String learningOutcomes;
-    private String assessmentCriteria;
-    private String purposeStatement;
+    private UnitStandardStatus status;
+    private String moderationBody;
+    private String rangeStatement;
+    private List<String> specificOutcomes;
+    private List<String> assessmentCriteria;
+    private List<String> criticalCrossFieldOutcomes;
     private Long programId;
+    private String qualificationType;
 }
